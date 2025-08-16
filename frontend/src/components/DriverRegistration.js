@@ -242,14 +242,17 @@ const DriverRegistration = ({ onDriverRegistered }) => {
   const canProceedToNext = () => {
     switch (currentStep) {
       case 1:
-        return profileData.firstname && profileData.lastname && profileData.email && profileData.phone && profileData.address;
+        return profileData.firstname && profileData.lastname && profileData.email && profileData.phone && 
+               profileData.street_number && profileData.street_name && profileData.city && profileData.postal_code;
       case 2:
         return documentFiles.identity_card_front && documentFiles.identity_card_back && documentFiles.proof_of_residence;
       case 3:
-        return businessData.siret && validateSIRET(businessData.siret) && businessData.company_name && businessData.business_address;
+        return documentFiles.civil_liability_insurance && documentFiles.vehicle_insurance && documentFiles.vehicle_contract;
       case 4:
-        return bankData.bank_name && bankData.iban && bankData.account_holder_name;
+        return businessData.siret && validateSIRET(businessData.siret) && businessData.company_name && businessData.business_address;
       case 5:
+        return bankData.bank_name && bankData.iban && bankData.account_holder_name;
+      case 6:
         return contractData.auto_entrepreneur_status && contractData.accepts_cgu && contractData.accepts_privacy_policy && contractData.accepts_app_download;
       default:
         return false;
