@@ -67,6 +67,11 @@ class DriverContract(BaseModel):
     accepts_privacy_policy: bool = False
     accepts_app_download: bool = False
     signature_date: Optional[datetime] = None
+    kyc_contract_generated: bool = False
+    kyc_contract_sent_date: Optional[datetime] = None
+    kyc_contract_signed: bool = False
+    kyc_contract_received_date: Optional[datetime] = None
+    commission_rate: float = 15.0  # % de commission par défaut
 
 class Driver(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
