@@ -191,6 +191,23 @@ const DriverRegistration = ({ onDriverRegistered }) => {
           break;
 
         case 3:
+          // Upload insurance documents
+          if (documentFiles.civil_liability_insurance) {
+            await uploadDocument('civil_liability_insurance', documentFiles.civil_liability_insurance);
+          }
+          if (documentFiles.vehicle_insurance) {
+            await uploadDocument('vehicle_insurance', documentFiles.vehicle_insurance);
+          }
+          if (documentFiles.vehicle_contract) {
+            await uploadDocument('vehicle_contract', documentFiles.vehicle_contract);
+          }
+          
+          await axios.put(`${API}/drivers/${driverId}`, {
+            registration_step: 3
+          });
+          break;
+
+        case 4:
           // Save business data (SIRET)
           if (businessData.kbis_document) {
             await uploadDocument('kbis_document', businessData.kbis_document);
@@ -202,19 +219,19 @@ const DriverRegistration = ({ onDriverRegistered }) => {
               company_name: businessData.company_name,
               business_address: businessData.business_address
             },
-            registration_step: 3
-          });
-          break;
-
-        case 4:
-          // Save bank information
-          await axios.put(`${API}/drivers/${driverId}`, {
-            bank_info: bankData,
             registration_step: 4
           });
           break;
 
         case 5:
+          // Save bank information
+          await axios.put(`${API}/drivers/${driverId}`, {
+            bank_info: bankData,
+            registration_step: 5
+          });
+          break;
+
+        case 6:
           // Complete registration
           const finalContractData = {
             ...contractData,
