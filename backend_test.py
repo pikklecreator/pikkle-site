@@ -296,6 +296,37 @@ class PikklesAPITester:
             f"drivers/{self.driver_id}/upload-document?document_type=kbis_document",
             422,  # Should fail without actual file
         )[0]
+
+    def test_invalid_driver_creation(self):
+        """Test creating driver with invalid data"""
+        invalid_data = {
+            "profile": {
+                "firstname": "",  # Empty firstname should fail validation
+                "email": "invalid-email"  # Invalid email format
+            }
+        }
+        
+        # This should either return 422 (validation error) or 400 (bad request)
+        success_422, _ = self.run_test(
+            "Create Driver - Invalid Data (expecting 422)",
+            "POST",
+            "drivers",
+            422,
+            data=invalid_data
+        )
+        
+        if not success_422:
+            # Try 400 as alternative
+            success_400, _ = self.run_test(
+                "Create Driver - Invalid Data (expecting 400)",
+                "POST",
+                "drivers",
+                400,
+                data=invalid_data
+            )
+            return success_400
+        
+        return success_422
         """Test creating driver with invalid data"""
         invalid_data = {
             "profile": {
