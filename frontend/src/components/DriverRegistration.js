@@ -506,7 +506,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   }`}
                 />
                 {profileData.phone && !validatePhone(profileData.phone) && (
-                  <p className="text-sm text-red-600">Numéro français requis (06, 07, 01, etc.)</p>
+                  <p className="text-sm text-red-600">Numéro français requis (06, 07, 01-05, 09 uniquement)</p>
                 )}
               </div>
             </div>
