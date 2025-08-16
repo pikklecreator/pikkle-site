@@ -180,7 +180,8 @@ async def upload_document(driver_id: str, document_type: str, file: UploadFile =
     # Validate document type
     valid_document_types = [
         "identity_card_front", "identity_card_back", "proof_of_residence",
-        "residence_permit", "kbis_document"
+        "residence_permit", "civil_liability_insurance", "vehicle_insurance", 
+        "vehicle_contract", "kbis_document"
     ]
     
     if document_type not in valid_document_types:
