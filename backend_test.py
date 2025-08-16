@@ -519,36 +519,49 @@ class PikklesAPITester:
         
         return True
 
-    def test_validation_siret_invalid(self):
-        """Test SIRET validation - should reject invalid SIRETs"""
-        if not self.driver_id:
-            print("❌ No driver ID available for testing")
-            return False
-            
-        invalid_sirets = ["123456789", "12345678901234567", "abcd1234567890", "123 456 789"]
+    def test_siret_api_validation(self):
+        """Test SIRET API validation endpoint"""
+        # Test valid SIRET
+        success1, response1 = self.run_test(
+            "SIRET API - Valid SIRET",
+            "GET",
+            "validate-siret/73282932000074",
+            200
+        )
         
-        for siret in invalid_sirets:
-            invalid_data = {
-                "business_info": {
-                    "siret": siret,
-                    "company_name": "Test Company",
-                    "business_address": "Test Address"
-                }
-            }
-            
-            success, response = self.run_test(
-                f"SIRET Validation - Invalid: {siret}",
-                "PUT",
-                f"drivers/{self.driver_id}",
-                400,
-                data=invalid_data
-            )
-            
-            if success and "SIRET" in str(response):
-                print(f"✅ SIRET validation working for: {siret}")
-            else:
-                print(f"❌ SIRET validation failed for: {siret}")
-                return False
+        if success1 and response1.get('isValid') and response1.get('isActive'):
+            print("✅ Valid SIRET API test passed")
+        else:
+            print("❌ Valid SIRET API test failed")
+            return False
+        
+        # Test blacklisted SIRET
+        success2, response2 = self.run_test(
+            "SIRET API - Blacklisted SIRET",
+            "GET", 
+            "validate-siret/12345678901234",
+            200
+        )
+        
+        if success2 and not response2.get('isActive'):
+            print("✅ Blacklisted SIRET API test passed")
+        else:
+            print("❌ Blacklisted SIRET API test failed")
+            return False
+        
+        # Test invalid format SIRET
+        success3, response3 = self.run_test(
+            "SIRET API - Invalid Format",
+            "GET",
+            "validate-siret/123456789",
+            200
+        )
+        
+        if success3 and not response3.get('isValid'):
+            print("✅ Invalid format SIRET API test passed")
+        else:
+            print("❌ Invalid format SIRET API test failed")
+            return False
         
         return True
 
