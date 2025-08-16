@@ -169,7 +169,7 @@ const DriverDashboard = ({ driver }) => {
           </Card>
         </div>
 
-        {/* Status Alert */}
+        {/* Status Alert with KYC */}
         {driver.status === 'under_review' && (
           <Card className="mb-8 border-amber-200 bg-amber-50">
             <CardContent className="p-4">
@@ -178,7 +178,40 @@ const DriverDashboard = ({ driver }) => {
                 <div>
                   <p className="font-medium text-amber-800">Dossier en cours de vérification</p>
                   <p className="text-sm text-amber-700 mt-1">
-                    Notre équipe examine votre dossier. Vous recevrez une notification dès validation (24-48h).
+                    Notre équipe examine votre dossier. Un contrat KYC personnalisé vous sera envoyé par email une fois validé.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
+        {driver.status === 'contract_pending' && (
+          <Card className="mb-8 border-blue-200 bg-blue-50">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3">
+                <FileCheck className="h-5 w-5 text-blue-500" />
+                <div>
+                  <p className="font-medium text-blue-800">🔐 Contrat KYC envoyé par email</p>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Votre contrat personnalisé a été envoyé à <strong>{driver.profile?.email}</strong>. 
+                    Signez-le et renvoyez-le pour activer définitivement votre compte.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {driver.status === 'active' && (
+          <Card className="mb-8 border-green-200 bg-green-50">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <div>
+                  <p className="font-medium text-green-800">✅ Compte Livreur Activé</p>
+                  <p className="text-sm text-green-700 mt-1">
+                    Votre contrat KYC a été validé ! Téléchargez maintenant l'application mobile pour commencer vos livraisons.
                   </p>
                 </div>
               </div>
