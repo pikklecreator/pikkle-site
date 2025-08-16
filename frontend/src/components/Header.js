@@ -33,17 +33,17 @@ const Header = ({ currentDriver, onLogout }) => {
           </Link>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-600 hover:text-green-600 transition-colors">
+          <nav className="hidden md:flex items-center space-x-10">
+            <Link to="/" className="text-gray-600 hover:text-green-600 transition-colors font-medium">
               Accueil
             </Link>
-            <a href="#about" className="text-gray-600 hover:text-green-600 transition-colors">
+            <a href="#about" className="text-gray-600 hover:text-green-600 transition-colors font-medium">
               Qui sommes-nous
             </a>
-            <a href="#how-it-works" className="text-gray-600 hover:text-green-600 transition-colors">
+            <a href="#how-it-works" className="text-gray-600 hover:text-green-600 transition-colors font-medium">
               Comment ça marche
             </a>
-            <a href="#contact" className="text-gray-600 hover:text-green-600 transition-colors">
+            <a href="#contact" className="text-gray-600 hover:text-green-600 transition-colors font-medium">
               Contact
             </a>
           </nav>
