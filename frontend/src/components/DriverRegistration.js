@@ -262,21 +262,45 @@ const DriverRegistration = ({ onDriverRegistered }) => {
     }
   };
 
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    // Format français : 06/07/01/02/03/04/05/08/09 + 8 chiffres
+    return /^0[1-9]([0-9]{8})$/.test(phone.replace(/\s/g, ''));
+  };
+
+  const validatePostalCode = (code) => {
+    return /^[0-9]{5}$/.test(code);
+  };
+
   const canProceedToNext = () => {
     switch (currentStep) {
       case 1:
-        return profileData.firstname && profileData.lastname && profileData.email && profileData.phone && 
-               profileData.street_number && profileData.street_name && profileData.city && profileData.postal_code;
+        return profileData.firstname && profileData.firstname.length >= 2 && 
+               profileData.lastname && profileData.lastname.length >= 2 && 
+               profileData.email && validateEmail(profileData.email) &&
+               profileData.phone && validatePhone(profileData.phone) &&
+               profileData.street_number && 
+               profileData.street_name && profileData.street_name.length >= 3 &&
+               profileData.city && profileData.city.length >= 2 &&
+               profileData.postal_code && validatePostalCode(profileData.postal_code);
       case 2:
         return documentFiles.identity_card_front && documentFiles.identity_card_back && documentFiles.proof_of_residence;
       case 3:
         return documentFiles.civil_liability_insurance && documentFiles.vehicle_insurance && documentFiles.vehicle_contract;
       case 4:
-        return businessData.siret && validateSIRET(businessData.siret) && businessData.company_name && 
-               businessData.business_address && businessData.vehicle_type && businessData.insurance_provider && 
-               businessData.insurance_number;
+        return businessData.siret && validateSIRET(businessData.siret) && 
+               businessData.company_name && businessData.company_name.length >= 3 &&
+               businessData.business_address && businessData.business_address.length >= 10 &&
+               businessData.vehicle_type && businessData.vehicle_type.length >= 3 &&
+               businessData.insurance_provider && businessData.insurance_provider.length >= 3 &&
+               businessData.insurance_number && businessData.insurance_number.length >= 5;
       case 5:
-        return bankData.bank_name && bankData.iban && bankData.account_holder_name;
+        return bankData.bank_name && bankData.bank_name.length >= 3 &&
+               bankData.iban && bankData.iban.length >= 15 && 
+               bankData.account_holder_name && bankData.account_holder_name.length >= 3;
       case 6:
         return contractData.auto_entrepreneur_status && contractData.accepts_cgu && contractData.accepts_privacy_policy && contractData.accepts_app_download;
       default:
