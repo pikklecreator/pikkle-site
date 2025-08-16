@@ -283,11 +283,11 @@ const DriverDashboard = ({ driver }) => {
                       )}
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Contrat signé</span>
-                      {stats?.document_status?.contract_signed ? (
+                      <span className="text-sm font-medium">Contrat KYC signé</span>
+                      {stats?.document_status?.kyc_contract_status ? (
                         <CheckCircle className="h-5 w-5 text-green-500" />
                       ) : (
-                        <XCircle className="h-5 w-5 text-red-500" />
+                        <AlertTriangle className="h-5 w-5 text-yellow-500" />
                       )}
                     </div>
                   </div>
