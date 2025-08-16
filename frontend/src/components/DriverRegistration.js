@@ -889,8 +889,8 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                 disabled={!canProceedToNext() || loading}
                 className="flex items-center space-x-2 btn-primary"
               >
-                <span>{currentStep === 5 ? 'Finaliser l\'inscription' : 'Suivant'}</span>
-                {currentStep < 5 && <ChevronRight className="h-4 w-4" />}
+                <span>{currentStep === 6 ? 'Finaliser l\'inscription' : 'Suivant'}</span>
+                {currentStep < 6 && <ChevronRight className="h-4 w-4" />}
                 {loading && <div className="loading-spinner h-4 w-4 border-2 border-white border-t-transparent rounded-full" />}
               </Button>
             </div>
