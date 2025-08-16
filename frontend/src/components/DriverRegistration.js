@@ -35,7 +35,12 @@ const DriverRegistration = ({ onDriverRegistered }) => {
     email: '',
     phone: '',
     date_of_birth: '',
-    address: ''
+    address: '',
+    street_number: '',
+    street_name: '',
+    city: '',
+    postal_code: '',
+    country: 'France'
   });
 
   const [documentFiles, setDocumentFiles] = useState({
