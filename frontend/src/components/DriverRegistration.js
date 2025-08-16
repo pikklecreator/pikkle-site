@@ -240,7 +240,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
           
           const completedDriver = await axios.put(`${API}/drivers/${driverId}`, {
             contract: finalContractData,
-            registration_step: 5,
+            registration_step: 6,
             status: 'under_review'
           });
           
