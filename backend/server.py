@@ -53,6 +53,9 @@ class DriverBusinessInfo(BaseModel):
     siret: str
     company_name: str
     business_address: str
+    vehicle_type: Optional[str] = None
+    insurance_provider: Optional[str] = None
+    insurance_number: Optional[str] = None
     siret_verified: bool = False
 
 class DriverBankInfo(BaseModel):
