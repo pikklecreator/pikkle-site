@@ -225,6 +225,22 @@ const DriverDashboard = ({ driver }) => {
                       )}
                     </div>
                     <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">SIRET fourni</span>
+                      {stats?.document_status?.siret_provided ? (
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-500" />
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">SIRET vérifié</span>
+                      {stats?.document_status?.siret_verified ? (
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">RIB validé</span>
                       {stats?.document_status?.bank_info_complete ? (
                         <CheckCircle className="h-5 w-5 text-green-500" />
