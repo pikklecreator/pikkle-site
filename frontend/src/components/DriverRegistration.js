@@ -659,7 +659,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
           </div>
         );
 
-      case 4:
+      case 5:
         return (
           <div className="space-y-6">
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
