@@ -416,23 +416,24 @@ def main():
     tester.test_api_root()
     
     # Run driver CRUD tests
-    print("\n📋 PHASE 2: Driver CRUD Tests")
+    print("\n📋 PHASE 2: Driver CRUD Tests - 6 Steps Flow")
     if tester.test_create_driver_step1():
         tester.test_get_driver()
         tester.test_update_driver_step2()
-        tester.test_update_driver_step3()
-        tester.test_update_driver_step4()
-        tester.test_update_driver_step5()
+        tester.test_update_driver_step3_insurance()
+        tester.test_update_driver_step4_siret()
+        tester.test_update_driver_step5_bank()
+        tester.test_update_driver_step6_final()
         
-        # Test dashboard endpoints with SIRET info
+        # Test dashboard endpoints with insurance info
         print("\n📋 PHASE 3: Dashboard API Tests")
         tester.test_get_driver_stats()
         tester.test_get_driver_payments()
         
-        # Test new SIRET functionality
-        print("\n📋 PHASE 4: SIRET Functionality Tests")
+        # Test new insurance and SIRET functionality
+        print("\n📋 PHASE 4: New Features Tests")
         tester.test_siret_validation()
-        tester.test_kbis_document_upload()
+        tester.test_insurance_document_upload()
     else:
         print("❌ Driver creation failed, skipping dependent tests")
     
