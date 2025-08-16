@@ -48,37 +48,36 @@ const Header = ({ currentDriver, onLogout }) => {
             </a>
           </nav>
 
-          {/* Auth Section */}
-          <div className="flex items-center space-x-6">
+          {/* Bouton CTA propre et moderne */}
+          <div className="flex items-center">
             {currentDriver ? (
               <div className="flex items-center space-x-4">
                 <Link 
                   to="/dashboard" 
-                  className="flex items-center space-x-2 text-gray-700 hover:text-green-600 transition-colors font-medium"
+                  className="flex items-center space-x-2 text-gray-700 hover:text-green-600 transition-colors font-medium px-3 py-2 rounded-lg hover:bg-green-50"
                 >
                   <User className="h-4 w-4" />
                   <span className="hidden sm:block">
-                    {currentDriver.profile?.firstname} {currentDriver.profile?.lastname}
+                    {currentDriver.profile?.firstname}
                   </span>
                 </Link>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={onLogout}
-                  className="flex items-center space-x-2 border-green-300 text-green-600 hover:bg-green-50"
+                  className="flex items-center space-x-2 border-green-300 text-green-600 hover:bg-green-50 hover:border-green-400"
                 >
                   <LogOut className="h-4 w-4" />
                   <span className="hidden sm:block">Déconnexion</span>
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
-                <Link to="/inscription-livreur">
-                  <Button size="sm" className="btn-primary px-6 py-2">
-                    Devenir Livreur Pikkles
-                  </Button>
-                </Link>
-              </div>
+              <Link to="/inscription-livreur">
+                <Button className="btn-primary px-8 py-2.5 text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Devenir Livreur
+                </Button>
+              </Link>
             )}
           </div>
         </div>
