@@ -670,6 +670,52 @@ const DriverRegistration = ({ onDriverRegistered }) => {
               />
             </div>
 
+            {/* Informations véhicule et assurance pour le contrat KYC */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-semibold text-blue-800 mb-4">🚗 Informations Véhicule & Assurance</h4>
+              <p className="text-sm text-blue-700 mb-4">
+                Ces informations seront intégrées dans votre contrat KYC personnalisé
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="vehicle_type">Type de véhicule *</Label>
+                  <Input
+                    id="vehicle_type"
+                    value={businessData.vehicle_type}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, vehicle_type: e.target.value }))}
+                    placeholder="Ex: Scooter 125cc, Vélo électrique, Voiture"
+                    required
+                    className="focus:border-green-500 focus:ring-green-500"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="insurance_provider">Fournisseur d'assurance *</Label>
+                  <Input
+                    id="insurance_provider"
+                    value={businessData.insurance_provider}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, insurance_provider: e.target.value }))}
+                    placeholder="Ex: MAIF, AssurPlus, RC-Pro Direct"
+                    required
+                    className="focus:border-green-500 focus:ring-green-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="mt-4 space-y-2">
+                <Label htmlFor="insurance_number">Numéro de police d'assurance *</Label>
+                <Input
+                  id="insurance_number"
+                  value={businessData.insurance_number}
+                  onChange={(e) => setBusinessData(prev => ({ ...prev, insurance_number: e.target.value }))}
+                  placeholder="Ex: POL-123456789"
+                  required
+                  className="focus:border-green-500 focus:ring-green-500"
+                />
+              </div>
+            </div>
+
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">
                 <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
