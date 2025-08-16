@@ -139,6 +139,44 @@ async def create_driver(driver_data: DriverUpdate):
         email_domain = profile.email.split('@')[1].lower()
         if email_domain in disposable_domains:
             raise HTTPException(status_code=400, detail="Email jetable non autorisé")
+        
+        # Validation cohérence code postal / ville
+        postal_code_cities = {
+            '75001': 'Paris', '75002': 'Paris', '75003': 'Paris', '75004': 'Paris', '75005': 'Paris',
+            '75006': 'Paris', '75007': 'Paris', '75008': 'Paris', '75009': 'Paris', '75010': 'Paris',
+            '75011': 'Paris', '75012': 'Paris', '75013': 'Paris', '75014': 'Paris', '75015': 'Paris',
+            '75016': 'Paris', '75017': 'Paris', '75018': 'Paris', '75019': 'Paris', '75020': 'Paris',
+            '13001': 'Marseille', '13002': 'Marseille', '13003': 'Marseille', '13004': 'Marseille',
+            '06000': 'Nice', '31000': 'Toulouse', '44000': 'Nantes', '67000': 'Strasbourg',
+            '34000': 'Montpellier', '33000': 'Bordeaux', '59000': 'Lille', '35000': 'Rennes',
+            '69001': 'Lyon', '69002': 'Lyon', '69003': 'Lyon', '69004': 'Lyon', '69005': 'Lyon'
+        }
+        
+        # Extraction du code postal depuis l'adresse
+        address_parts = profile.address.split(',')
+        postal_found = None
+        city_found = None
+        
+        for part in address_parts:
+            part_clean = part.strip()
+            # Chercher le code postal (5 chiffres)
+            postal_match = re.search(r'\b\d{5}\b', part_clean)
+            if postal_match:
+                postal_found = postal_match.group()
+            # Chercher le nom de ville
+            for city_name in set(postal_code_cities.values()):
+                if city_name.lower() in part_clean.lower():
+                    city_found = city_name
+                    break
+        
+        # Vérifier la cohérence si on trouve les deux
+        if postal_found and city_found:
+            expected_city = postal_code_cities.get(postal_found)
+            if expected_city and expected_city.lower() != city_found.lower():
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Incohérence: le code postal {postal_found} correspond à {expected_city}, pas à {city_found}"
+                )
     
     driver_dict = {
         "id": str(uuid.uuid4()),
