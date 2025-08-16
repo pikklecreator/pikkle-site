@@ -355,23 +355,45 @@ async def confirm_kyc_signature(driver_id: str):
     
     return {"message": "Contrat KYC validé - Compte livreur activé"}
 
-@api_router.get("/drivers/{driver_id}/kyc-status")
-async def get_kyc_status(driver_id: str):
-    """Récupérer le statut KYC du livreur"""
-    driver = await db.drivers.find_one({"id": driver_id})
-    if not driver:
-        raise HTTPException(status_code=404, detail="Livreur non trouvé")
+@api_router.get("/validate-siret/{siret}")
+async def validate_siret(siret: str):
+    """Valider un SIRET avec l'API INSEE (simulation)"""
+    import re
     
-    contract = driver.get("contract", {})
+    # Nettoyer le SIRET
+    siret_clean = re.sub(r'[^\d]', '', siret)
+    
+    # Validation format
+    if not re.match(r'^\d{14}$', siret_clean):
+        return {"isValid": False, "isActive": False, "error": "Format invalide"}
+    
+    # Algorithme de validation SIRET (Luhn modifié)
+    siren = siret_clean[:9]
+    
+    # Calcul clé de contrôle SIREN
+    sum_total = 0
+    for i, digit in enumerate(siren):
+        d = int(digit)
+        if i % 2 == 1:  # Position paire (en commençant par 0)
+            d *= 2
+            if d > 9:
+                d = d // 10 + d % 10
+        sum_total += d
+    
+    is_valid = (sum_total % 10) == 0
+    
+    # En production, faire appel à l'API INSEE ici
+    # response = requests.get(f"https://api.insee.fr/entreprises/sirene/V3/siret/{siret_clean}")
+    
+    # Simulation : certains SIRET sont "blacklistés" pour les tests
+    blacklisted_sirets = ["12345678901234", "11111111111111", "00000000000000"]
+    is_active = siret_clean not in blacklisted_sirets
     
     return {
-        "kyc_status": {
-            "contract_generated": contract.get("kyc_contract_generated", False),
-            "contract_sent_date": contract.get("kyc_contract_sent_date"),
-            "contract_signed": contract.get("kyc_contract_signed", False),
-            "contract_received_date": contract.get("kyc_contract_received_date"),
-            "account_status": driver.get("status", "pending")
-        }
+        "isValid": is_valid,
+        "isActive": is_active and is_valid,
+        "siret": siret_clean,
+        "message": "SIRET valide et actif" if (is_valid and is_active) else "SIRET invalide ou inactif"
     }
 
 # Statistics and Dashboard Routes
