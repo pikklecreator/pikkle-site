@@ -180,7 +180,7 @@ class PikklesAPITester:
         )[0]
 
     def test_update_driver_step5(self):
-        """Test updating driver with step 5 data (contract)"""
+        """Test updating driver with step 5 data (contract with app download)"""
         if not self.driver_id:
             print("❌ No driver ID available for testing")
             return False
@@ -190,6 +190,7 @@ class PikklesAPITester:
                 "auto_entrepreneur_status": True,
                 "accepts_cgu": True,
                 "accepts_privacy_policy": True,
+                "accepts_app_download": True,
                 "signature_date": datetime.utcnow().isoformat()
             },
             "registration_step": 5,
@@ -197,7 +198,7 @@ class PikklesAPITester:
         }
         
         return self.run_test(
-            "Update Driver - Step 5 (Contract)",
+            "Update Driver - Step 5 (Contract with App Download)",
             "PUT",
             f"drivers/{self.driver_id}",
             200,
