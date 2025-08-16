@@ -8,14 +8,15 @@ import { Checkbox } from './ui/checkbox';
 import { 
   User, 
   FileText, 
-  Briefcase, 
   CreditCard, 
   FileCheck,
   ChevronRight,
   ChevronLeft,
   Upload,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Building,
+  Banknote
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -41,11 +42,14 @@ const DriverRegistration = ({ onDriverRegistered }) => {
     identity_card_front: null,
     identity_card_back: null,
     proof_of_residence: null,
-    residence_permit: null,
-    driving_license: null,
-    vehicle_insurance: null,
-    criminal_record: null,
-    vehicle_registration: null
+    residence_permit: null
+  });
+
+  const [businessData, setBusinessData] = useState({
+    siret: '',
+    company_name: '',
+    business_address: '',
+    kbis_document: null
   });
 
   const [bankData, setBankData] = useState({
@@ -58,7 +62,8 @@ const DriverRegistration = ({ onDriverRegistered }) => {
   const [contractData, setContractData] = useState({
     auto_entrepreneur_status: false,
     accepts_cgu: false,
-    accepts_privacy_policy: false
+    accepts_privacy_policy: false,
+    accepts_app_download: false
   });
 
   const steps = [
@@ -70,35 +75,48 @@ const DriverRegistration = ({ onDriverRegistered }) => {
     },
     { 
       id: 2, 
-      title: 'Identité', 
+      title: 'Documents', 
       icon: <FileText className="h-5 w-5" />,
-      description: 'Vérification d\'identité'
+      description: 'Pièces d\'identité'
     },
     { 
       id: 3, 
-      title: 'Documents', 
-      icon: <Briefcase className="h-5 w-5" />,
-      description: 'Documents professionnels'
+      title: 'SIRET', 
+      icon: <Building className="h-5 w-5" />,
+      description: 'Statut indépendant'
     },
     { 
       id: 4, 
-      title: 'Banque', 
+      title: 'RIB', 
       icon: <CreditCard className="h-5 w-5" />,
       description: 'Coordonnées bancaires'
     },
     { 
       id: 5, 
-      title: 'Contrat', 
+      title: 'Validation', 
       icon: <FileCheck className="h-5 w-5" />,
-      description: 'Contrat indépendant'
+      description: 'Finalisation'
     }
   ];
 
+  const validateSIRET = (siret) => {
+    // Remove spaces and check if it's 14 digits
+    const cleanSiret = siret.replace(/\s/g, '');
+    return /^\d{14}$/.test(cleanSiret);
+  };
+
   const handleFileChange = (documentType, file) => {
-    setDocumentFiles(prev => ({
-      ...prev,
-      [documentType]: file
-    }));
+    if (documentType === 'kbis_document') {
+      setBusinessData(prev => ({
+        ...prev,
+        kbis_document: file
+      }));
+    } else {
+      setDocumentFiles(prev => ({
+        ...prev,
+        [documentType]: file
+      }));
+    }
   };
 
   const uploadDocument = async (documentType, file) => {
@@ -153,28 +171,23 @@ const DriverRegistration = ({ onDriverRegistered }) => {
             await uploadDocument('residence_permit', documentFiles.residence_permit);
           }
           
-          // Update registration step
           await axios.put(`${API}/drivers/${driverId}`, {
             registration_step: 2
           });
           break;
 
         case 3:
-          // Upload professional documents
-          if (documentFiles.driving_license) {
-            await uploadDocument('driving_license', documentFiles.driving_license);
-          }
-          if (documentFiles.vehicle_insurance) {
-            await uploadDocument('vehicle_insurance', documentFiles.vehicle_insurance);
-          }
-          if (documentFiles.criminal_record) {
-            await uploadDocument('criminal_record', documentFiles.criminal_record);
-          }
-          if (documentFiles.vehicle_registration) {
-            await uploadDocument('vehicle_registration', documentFiles.vehicle_registration);
+          // Save business data (SIRET)
+          if (businessData.kbis_document) {
+            await uploadDocument('kbis_document', businessData.kbis_document);
           }
           
           await axios.put(`${API}/drivers/${driverId}`, {
+            business_info: {
+              siret: businessData.siret,
+              company_name: businessData.company_name,
+              business_address: businessData.business_address
+            },
             registration_step: 3
           });
           break;
@@ -207,7 +220,6 @@ const DriverRegistration = ({ onDriverRegistered }) => {
       setCurrentStep(prev => prev + 1);
     } catch (error) {
       console.error('Erreur lors de la soumission:', error);
-      // Handle error - you might want to show a toast/alert here
     } finally {
       setLoading(false);
     }
@@ -218,20 +230,20 @@ const DriverRegistration = ({ onDriverRegistered }) => {
       case 1:
         return profileData.firstname && profileData.lastname && profileData.email && profileData.phone && profileData.address;
       case 2:
-        return documentFiles.identity_card_front && documentFiles.proof_of_residence;
+        return documentFiles.identity_card_front && documentFiles.identity_card_back && documentFiles.proof_of_residence;
       case 3:
-        return documentFiles.driving_license && documentFiles.vehicle_insurance;
+        return businessData.siret && validateSIRET(businessData.siret) && businessData.company_name && businessData.business_address;
       case 4:
         return bankData.bank_name && bankData.iban && bankData.account_holder_name;
       case 5:
-        return contractData.auto_entrepreneur_status && contractData.accepts_cgu && contractData.accepts_privacy_policy;
+        return contractData.auto_entrepreneur_status && contractData.accepts_cgu && contractData.accepts_privacy_policy && contractData.accepts_app_download;
       default:
         return false;
     }
   };
 
   const FileUploadArea = ({ documentType, title, required = false, accept = ".jpg,.jpeg,.png,.pdf" }) => {
-    const file = documentFiles[documentType];
+    const file = documentType === 'kbis_document' ? businessData.kbis_document : documentFiles[documentType];
     
     return (
       <div className="space-y-2">
@@ -239,7 +251,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
           {title}
           {required && <span className="text-red-500 ml-1">*</span>}
         </Label>
-        <div className={`file-upload-area p-6 rounded-lg text-center ${file ? 'bg-green-50 border-green-200' : 'bg-gray-50'}`}>
+        <div className={`file-upload-area p-6 rounded-lg text-center border-2 ${file ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-dashed border-gray-300'}`}>
           <input
             type="file"
             accept={accept}
@@ -272,6 +284,18 @@ const DriverRegistration = ({ onDriverRegistered }) => {
       case 1:
         return (
           <div className="space-y-6">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <AlertCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-green-800">Livreur Indépendant Pikkles</p>
+                  <p className="text-sm text-green-600 mt-1">
+                    Vous devez posséder un SIRET pour travailler avec nous
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstname">Prénom *</Label>
@@ -281,6 +305,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   onChange={(e) => setProfileData(prev => ({ ...prev, firstname: e.target.value }))}
                   placeholder="Votre prénom"
                   required
+                  className="focus:border-green-500 focus:ring-green-500"
                 />
               </div>
               <div className="space-y-2">
@@ -291,6 +316,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   onChange={(e) => setProfileData(prev => ({ ...prev, lastname: e.target.value }))}
                   placeholder="Votre nom"
                   required
+                  className="focus:border-green-500 focus:ring-green-500"
                 />
               </div>
             </div>
@@ -305,6 +331,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="votre@email.com"
                   required
+                  className="focus:border-green-500 focus:ring-green-500"
                 />
               </div>
               <div className="space-y-2">
@@ -316,6 +343,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
                   placeholder="06 12 34 56 78"
                   required
+                  className="focus:border-green-500 focus:ring-green-500"
                 />
               </div>
             </div>
@@ -327,11 +355,12 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                 type="date"
                 value={profileData.date_of_birth}
                 onChange={(e) => setProfileData(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                className="focus:border-green-500 focus:ring-green-500"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Adresse complète *</Label>
+              <Label htmlFor="address">Adresse personnelle *</Label>
               <Textarea
                 id="address"
                 value={profileData.address}
@@ -339,6 +368,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                 placeholder="Numéro, rue, ville, code postal..."
                 rows={3}
                 required
+                className="focus:border-green-500 focus:ring-green-500"
               />
             </div>
           </div>
@@ -351,9 +381,9 @@ const DriverRegistration = ({ onDriverRegistered }) => {
               <div className="flex items-start space-x-3">
                 <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-blue-800">Documents requis</p>
+                  <p className="text-sm font-medium text-blue-800">Documents d'identité requis</p>
                   <p className="text-sm text-blue-600 mt-1">
-                    Carte d'identité (recto-verso) et justificatif de domicile de moins de 3 mois
+                    CNI recto-verso obligatoire + justificatif de domicile récent
                   </p>
                 </div>
               </div>
@@ -372,7 +402,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
               />
               <FileUploadArea 
                 documentType="proof_of_residence"
-                title="Justificatif de domicile"
+                title="Justificatif de domicile (< 3 mois)"
                 required
               />
               <FileUploadArea 
@@ -386,46 +416,81 @@ const DriverRegistration = ({ onDriverRegistered }) => {
       case 3:
         return (
           <div className="space-y-6">
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
+                <Building className="h-5 w-5 text-green-500 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-amber-800">Documents professionnels</p>
-                  <p className="text-sm text-amber-600 mt-1">
-                    Permis de conduire, assurance véhicule et attestation B3 recommandés
+                  <p className="text-sm font-medium text-green-800">Statut indépendant obligatoire</p>
+                  <p className="text-sm text-green-600 mt-1">
+                    SIRET domicilié en France métropolitaine uniquement
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="siret">Numéro SIRET *</Label>
+                <Input
+                  id="siret"
+                  value={businessData.siret}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{3})(\d{5})/, '$1 $2 $3 $4');
+                    setBusinessData(prev => ({ ...prev, siret: value }));
+                  }}
+                  placeholder="123 456 789 01234"
+                  required
+                  className={`focus:border-green-500 focus:ring-green-500 ${
+                    businessData.siret && !validateSIRET(businessData.siret) ? 'border-red-500' : ''
+                  }`}
+                  maxLength={17}
+                />
+                {businessData.siret && !validateSIRET(businessData.siret) && (
+                  <p className="text-sm text-red-600">SIRET invalide (14 chiffres requis)</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="company_name">Nom de votre entreprise/activité *</Label>
+                <Input
+                  id="company_name"
+                  value={businessData.company_name}
+                  onChange={(e) => setBusinessData(prev => ({ ...prev, company_name: e.target.value }))}
+                  placeholder="Ex: Jean Dupont Auto-Entrepreneur"
+                  required
+                  className="focus:border-green-500 focus:ring-green-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="business_address">Adresse de domiciliation *</Label>
+                <Textarea
+                  id="business_address"
+                  value={businessData.business_address}
+                  onChange={(e) => setBusinessData(prev => ({ ...prev, business_address: e.target.value }))}
+                  placeholder="Adresse où votre SIRET est domicilié"
+                  rows={3}
+                  required
+                  className="focus:border-green-500 focus:ring-green-500"
+                />
+              </div>
+
               <FileUploadArea 
-                documentType="driving_license"
-                title="Permis de conduire"
-                required
-              />
-              <FileUploadArea 
-                documentType="vehicle_insurance"
-                title="Assurance véhicule"
-                required
-              />
-              <FileUploadArea 
-                documentType="criminal_record"
-                title="Attestation B3 (casier judiciaire)"
-              />
-              <FileUploadArea 
-                documentType="vehicle_registration"
-                title="Carte grise du véhicule"
+                documentType="kbis_document"
+                title="K-bis ou Attestation URSSAF"
               />
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium text-gray-800 mb-2">Informations importantes</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Le permis B est obligatoire pour véhicules légers</li>
-                <li>• L'assurance doit couvrir l'usage professionnel</li>
-                <li>• L'attestation B3 filtre les antécédents judiciaires</li>
-              </ul>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800">Vérification automatique</p>
+                  <p className="text-sm text-amber-600 mt-1">
+                    Votre SIRET sera vérifié auprès du répertoire SIRENE
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -435,11 +500,11 @@ const DriverRegistration = ({ onDriverRegistered }) => {
           <div className="space-y-6">
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                <Banknote className="h-5 w-5 text-green-500 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-green-800">Paiements sécurisés</p>
+                  <p className="text-sm font-medium text-green-800">RIB sécurisé</p>
                   <p className="text-sm text-green-600 mt-1">
-                    Vos informations bancaires sont protégées et chiffrées
+                    Vos gains seront virés chaque semaine sur ce compte
                   </p>
                 </div>
               </div>
@@ -454,6 +519,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   onChange={(e) => setBankData(prev => ({ ...prev, bank_name: e.target.value }))}
                   placeholder="Ex: Crédit Mutuel, BNP Paribas..."
                   required
+                  className="focus:border-green-500 focus:ring-green-500"
                 />
               </div>
 
@@ -465,6 +531,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   onChange={(e) => setBankData(prev => ({ ...prev, account_holder_name: e.target.value }))}
                   placeholder="Nom exact sur le RIB"
                   required
+                  className="focus:border-green-500 focus:ring-green-500"
                 />
               </div>
 
@@ -476,6 +543,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   onChange={(e) => setBankData(prev => ({ ...prev, iban: e.target.value.replace(/\s/g, '').toUpperCase() }))}
                   placeholder="FR76 1234 5678 9012 3456 7890 123"
                   required
+                  className="focus:border-green-500 focus:ring-green-500"
                 />
               </div>
 
@@ -486,6 +554,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   value={bankData.bic}
                   onChange={(e) => setBankData(prev => ({ ...prev, bic: e.target.value.toUpperCase() }))}
                   placeholder="BNPAFRPPXXX"
+                  className="focus:border-green-500 focus:ring-green-500"
                 />
               </div>
             </div>
@@ -495,13 +564,13 @@ const DriverRegistration = ({ onDriverRegistered }) => {
       case 5:
         return (
           <div className="space-y-6">
-            <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 text-indigo-500 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-indigo-800">Finalisation</p>
-                  <p className="text-sm text-indigo-600 mt-1">
-                    Dernière étape : acceptez les conditions pour devenir livreur Pikkles
+                  <p className="text-sm font-medium text-green-800">Dernière étape !</p>
+                  <p className="text-sm text-green-600 mt-1">
+                    Validez votre inscription et téléchargez l'app mobile
                   </p>
                 </div>
               </div>
@@ -515,7 +584,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   onCheckedChange={(checked) => setContractData(prev => ({ ...prev, auto_entrepreneur_status: checked }))}
                 />
                 <Label htmlFor="auto_entrepreneur" className="text-sm leading-5">
-                  Je certifie exercer en tant qu'auto-entrepreneur ou avoir les autorisations nécessaires pour cette activité
+                  Je certifie être travailleur indépendant avec un SIRET valide domicilié en France
                 </Label>
               </div>
 
@@ -527,10 +596,9 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                 />
                 <Label htmlFor="cgu" className="text-sm leading-5">
                   J'accepte les{' '}
-                  <a href="/cgu" target="_blank" className="text-indigo-600 hover:underline">
-                    Conditions Générales d'Utilisation
+                  <a href="/cgu" target="_blank" className="text-green-600 hover:underline">
+                    Conditions Générales d'Utilisation Pikkles
                   </a>
-                  {' '}et le contrat de prestation de services
                 </Label>
               </div>
 
@@ -542,21 +610,32 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                 />
                 <Label htmlFor="privacy" className="text-sm leading-5">
                   J'accepte la{' '}
-                  <a href="/confidentialite" target="_blank" className="text-indigo-600 hover:underline">
+                  <a href="/confidentialite" target="_blank" className="text-green-600 hover:underline">
                     Politique de Confidentialité
                   </a>
-                  {' '}et le traitement de mes données personnelles
+                  {' '}et le traitement de mes données
+                </Label>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="app_download"
+                  checked={contractData.accepts_app_download}
+                  onCheckedChange={(checked) => setContractData(prev => ({ ...prev, accepts_app_download: checked }))}
+                />
+                <Label htmlFor="app_download" className="text-sm leading-5">
+                  Je m'engage à télécharger l'application mobile Pikkles pour effectuer mes livraisons
                 </Label>
               </div>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium text-gray-800 mb-2">Prochaines étapes</h4>
+              <h4 className="font-medium text-gray-800 mb-2">Après validation de votre dossier :</h4>
               <ol className="text-sm text-gray-600 space-y-1">
-                <li>1. Vérification de votre dossier (24-48h)</li>
-                <li>2. Validation de vos documents</li>
-                <li>3. Activation de votre compte livreur</li>
-                <li>4. Accès au dashboard et première mission</li>
+                <li>1. Vérification documents et SIRET (24-48h)</li>
+                <li>2. Activation de votre compte livreur</li>
+                <li>3. Téléchargement de l'app mobile obligatoire</li>
+                <li>4. Formation en ligne et première course</li>
               </ol>
             </div>
           </div>
@@ -602,23 +681,23 @@ const DriverRegistration = ({ onDriverRegistered }) => {
         </div>
 
         {/* Step Content */}
-        <Card className="form-slide-in">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
+        <Card className="form-slide-in border-green-200">
+          <CardHeader className="bg-green-50">
+            <CardTitle className="flex items-center space-x-2 text-green-800">
               {steps.find(s => s.id === currentStep)?.icon}
               <span>Étape {currentStep}: {steps.find(s => s.id === currentStep)?.title}</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             {renderStepContent()}
 
             {/* Navigation */}
-            <div className="flex justify-between pt-8 mt-8 border-t">
+            <div className="flex justify-between pt-8 mt-8 border-t border-green-200">
               <Button
                 variant="outline"
                 onClick={() => setCurrentStep(prev => prev - 1)}
                 disabled={currentStep === 1}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 border-green-300 text-green-600 hover:bg-green-50"
               >
                 <ChevronLeft className="h-4 w-4" />
                 <span>Précédent</span>
