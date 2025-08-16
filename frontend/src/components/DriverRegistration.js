@@ -325,6 +325,24 @@ const DriverRegistration = ({ onDriverRegistered }) => {
     }
   };
 
+  const [siretValidationLoading, setSiretValidationLoading] = useState(false);
+  const [siretValidationResult, setSiretValidationResult] = useState(null);
+
+  // Validation SIRET en temps réel
+  const handleSiretChange = async (value) => {
+    const siretFormatted = value.replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{3})(\d{5})/, '$1 $2 $3 $4');
+    setBusinessData(prev => ({ ...prev, siret: siretFormatted }));
+    
+    if (value.replace(/\s/g, '').length === 14) {
+      setSiretValidationLoading(true);
+      const isValid = await checkSIRETWithAPI(value);
+      setSiretValidationResult(isValid);
+      setSiretValidationLoading(false);
+    } else {
+      setSiretValidationResult(null);
+    }
+  };
+
   const canProceedToNext = () => {
     switch (currentStep) {
       case 1:
@@ -341,8 +359,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
       case 3:
         return documentFiles.civil_liability_insurance && documentFiles.vehicle_insurance && documentFiles.vehicle_contract;
       case 4:
-        const siretValid = businessData.siret && await checkSIRETWithAPI(businessData.siret);
-        return siretValid && 
+        return businessData.siret && siretValidationResult === true &&
                businessData.company_name && businessData.company_name.length >= 3 &&
                businessData.business_address && businessData.business_address.length >= 10 &&
                businessData.vehicle_type && businessData.vehicle_type.length >= 3 &&
