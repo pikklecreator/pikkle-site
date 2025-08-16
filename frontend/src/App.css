@@ -14,7 +14,19 @@ body {
 
 .App {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+}
+
+/* Pikkles Green Theme Colors */
+:root {
+  --primary-green: #16a34a;
+  --secondary-green: #22c55e;
+  --light-green: #4ade80;
+  --dark-green: #15803d;
+  --accent-green: #dcfce7;
+  --text-dark: #14532d;
+  --text-medium: #166534;
+  --text-light: #22c55e;
 }
 
 /* Hero section animations */
@@ -39,32 +51,35 @@ body {
   }
 }
 
-/* Button animations */
+/* Button animations with green theme */
 .btn-primary {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
   transition: all 0.3s ease;
   transform: translateY(0);
+  border: none;
+  color: white;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  background: linear-gradient(135deg, var(--dark-green) 0%, var(--primary-green) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 10px 25px rgba(22, 163, 74, 0.25);
+  color: white;
 }
 
 .btn-secondary {
   background: white;
-  color: #4f46e5;
-  border: 2px solid #4f46e5;
+  color: var(--primary-green);
+  border: 2px solid var(--primary-green);
   transition: all 0.3s ease;
   transform: translateY(0);
 }
 
 .btn-secondary:hover {
-  background: #4f46e5;
+  background: var(--primary-green);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 8px 20px rgba(22, 163, 74, 0.2);
 }
 
 /* Card animations */
@@ -75,10 +90,10 @@ body {
 
 .card-hover:hover {
   transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(22, 163, 74, 0.15);
 }
 
-/* Step indicator */
+/* Step indicator with green theme */
 .step-indicator {
   width: 40px;
   height: 40px;
@@ -91,13 +106,13 @@ body {
 }
 
 .step-indicator.active {
-  background: #4f46e5;
+  background: var(--primary-green);
   color: white;
   transform: scale(1.1);
 }
 
 .step-indicator.completed {
-  background: #10b981;
+  background: var(--secondary-green);
   color: white;
 }
 
@@ -122,7 +137,7 @@ body {
   }
 }
 
-/* File upload area */
+/* File upload area with green theme */
 .file-upload-area {
   border: 2px dashed #d1d5db;
   transition: all 0.3s ease;
@@ -130,16 +145,16 @@ body {
 }
 
 .file-upload-area:hover {
-  border-color: #4f46e5;
-  background-color: #f8fafc;
+  border-color: var(--primary-green);
+  background-color: var(--accent-green);
 }
 
 .file-upload-area.dragover {
-  border-color: #4f46e5;
-  background-color: #eef2ff;
+  border-color: var(--primary-green);
+  background-color: var(--accent-green);
 }
 
-/* Status badges */
+/* Status badges with green theme */
 .status-badge {
   font-size: 0.75rem;
   padding: 0.25rem 0.75rem;
@@ -150,8 +165,8 @@ body {
 }
 
 .status-validated {
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--accent-green);
+  color: var(--dark-green);
 }
 
 .status-pending {
@@ -164,26 +179,26 @@ body {
   color: #991b1b;
 }
 
-/* Dashboard cards */
+/* Dashboard cards with green accents */
 .dashboard-card {
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(22, 163, 74, 0.1);
+  border: 1px solid var(--accent-green);
   transition: all 0.3s ease;
 }
 
 .dashboard-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
   transform: translateY(-2px);
 }
 
-/* Glassmorphism effect */
+/* Glassmorphism effect with green tint */
 .glass-card {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
 /* Responsive utilities */
@@ -197,9 +212,11 @@ body {
   }
 }
 
-/* Loading states */
+/* Loading states with green theme */
 .loading-spinner {
   animation: spin 1s linear infinite;
+  border-color: var(--primary-green);
+  border-top-color: transparent;
 }
 
 @keyframes spin {
@@ -209,4 +226,38 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Pikkles specific styles */
+.pickle-gradient {
+  background: linear-gradient(135deg, var(--light-green) 0%, var(--primary-green) 100%);
+}
+
+.pickle-text-gradient {
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pickle-shadow {
+  box-shadow: 0 4px 20px rgba(22, 163, 74, 0.2);
+}
+
+.pickle-hover:hover {
+  background: var(--accent-green);
+  border-color: var(--primary-green);
+}
+
+/* Success and error states */
+.success-green {
+  background: var(--accent-green);
+  color: var(--dark-green);
+  border: 1px solid var(--secondary-green);
+}
+
+.error-red {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
 }

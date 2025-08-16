@@ -5,28 +5,45 @@ import { User, LogOut, Truck } from 'lucide-react';
 
 const Header = ({ currentDriver, onLogout }) => {
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-white shadow-sm border-b border-green-200 sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-2 rounded-lg">
-              <Truck className="h-6 w-6 text-white" />
+          {/* Logo avec image cornichon */}
+          <Link to="/" className="flex items-center space-x-3">
+            <div className="relative">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_driver-signup/artifacts/7fbxvm54_PIKKLES.webp" 
+                alt="Pikkles Logo"
+                className="h-10 w-auto"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+              <div className="hidden bg-gradient-to-r from-green-500 to-green-600 p-2 rounded-lg">
+                <Truck className="h-6 w-6 text-white" />
+              </div>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Pikkles
-            </span>
+            <div>
+              <span className="text-2xl font-bold pickle-text-gradient">
+                Pikkles
+              </span>
+              <p className="text-xs text-green-600 -mt-1">Livraison verte</p>
+            </div>
           </Link>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-600 hover:text-indigo-600 transition-colors">
+            <Link to="/" className="text-gray-600 hover:text-green-600 transition-colors">
               Accueil
             </Link>
-            <a href="#features" className="text-gray-600 hover:text-indigo-600 transition-colors">
-              Avantages
+            <a href="#about" className="text-gray-600 hover:text-green-600 transition-colors">
+              Qui sommes-nous
             </a>
-            <a href="#contact" className="text-gray-600 hover:text-indigo-600 transition-colors">
+            <a href="#how-it-works" className="text-gray-600 hover:text-green-600 transition-colors">
+              Comment ça marche
+            </a>
+            <a href="#contact" className="text-gray-600 hover:text-green-600 transition-colors">
               Contact
             </a>
           </nav>
@@ -37,7 +54,7 @@ const Header = ({ currentDriver, onLogout }) => {
               <div className="flex items-center space-x-3">
                 <Link 
                   to="/dashboard" 
-                  className="flex items-center space-x-2 text-gray-700 hover:text-indigo-600 transition-colors"
+                  className="flex items-center space-x-2 text-gray-700 hover:text-green-600 transition-colors"
                 >
                   <User className="h-4 w-4" />
                   <span className="hidden sm:block">
@@ -48,7 +65,7 @@ const Header = ({ currentDriver, onLogout }) => {
                   variant="outline" 
                   size="sm" 
                   onClick={onLogout}
-                  className="flex items-center space-x-1"
+                  className="flex items-center space-x-1 border-green-300 text-green-600 hover:bg-green-50"
                 >
                   <LogOut className="h-4 w-4" />
                   <span className="hidden sm:block">Déconnexion</span>
@@ -57,13 +74,8 @@ const Header = ({ currentDriver, onLogout }) => {
             ) : (
               <div className="flex items-center space-x-3">
                 <Link to="/inscription-livreur">
-                  <Button variant="outline" size="sm">
-                    Connexion
-                  </Button>
-                </Link>
-                <Link to="/inscription-livreur">
                   <Button size="sm" className="btn-primary">
-                    Devenir Livreur
+                    Devenir Livreur Pikkles
                   </Button>
                 </Link>
               </div>
