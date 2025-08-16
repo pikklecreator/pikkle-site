@@ -170,6 +170,23 @@ const DriverRegistration = ({ onDriverRegistered }) => {
           setDriverId(driverResponse.data.id);
           break;
 
+        case 3:
+          // Upload insurance documents
+          if (documentFiles.civil_liability_insurance) {
+            await uploadDocument('civil_liability_insurance', documentFiles.civil_liability_insurance);
+          }
+          if (documentFiles.vehicle_insurance) {
+            await uploadDocument('vehicle_insurance', documentFiles.vehicle_insurance);
+          }
+          if (documentFiles.vehicle_contract) {
+            await uploadDocument('vehicle_contract', documentFiles.vehicle_contract);
+          }
+          
+          await axios.put(`${API}/drivers/${driverId}`, {
+            registration_step: 3
+          });
+          break;
+
         case 2:
           // Upload identity documents
           if (documentFiles.identity_card_front) {
@@ -187,23 +204,6 @@ const DriverRegistration = ({ onDriverRegistered }) => {
           
           await axios.put(`${API}/drivers/${driverId}`, {
             registration_step: 2
-          });
-          break;
-
-        case 3:
-          // Upload insurance documents
-          if (documentFiles.civil_liability_insurance) {
-            await uploadDocument('civil_liability_insurance', documentFiles.civil_liability_insurance);
-          }
-          if (documentFiles.vehicle_insurance) {
-            await uploadDocument('vehicle_insurance', documentFiles.vehicle_insurance);
-          }
-          if (documentFiles.vehicle_contract) {
-            await uploadDocument('vehicle_contract', documentFiles.vehicle_contract);
-          }
-          
-          await axios.put(`${API}/drivers/${driverId}`, {
-            registration_step: 3
           });
           break;
 
