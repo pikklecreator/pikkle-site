@@ -425,7 +425,7 @@ const DriverDashboard = ({ driver }) => {
                         <p className="mt-1">{driver.profile?.phone}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-600">Adresse</label>
+                        <label className="text-sm font-medium text-gray-600">Adresse personnelle</label>
                         <p className="mt-1 text-sm">{driver.profile?.address}</p>
                       </div>
                     </div>
@@ -446,6 +446,29 @@ const DriverDashboard = ({ driver }) => {
                         <label className="text-sm font-medium text-gray-600">Adresse de domiciliation</label>
                         <p className="mt-1 text-sm">{driver.business_info?.business_address || 'Non renseignée'}</p>
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-6 border-t">
+                  <h4 className="font-medium text-gray-900 mb-4">Informations bancaires</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Banque</label>
+                      <p className="mt-1">{driver.bank_info?.bank_name || 'Non renseignée'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Titulaire</label>
+                      <p className="mt-1">{driver.bank_info?.account_holder_name || 'Non renseigné'}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-medium text-gray-600">IBAN</label>
+                      <p className="mt-1 font-mono text-sm">
+                        {driver.bank_info?.iban ? 
+                          `${driver.bank_info.iban.substring(0, 8)}****${driver.bank_info.iban.substring(driver.bank_info.iban.length - 4)}` 
+                          : 'Non renseigné'
+                        }
+                      </p>
                     </div>
                   </div>
                 </div>
