@@ -353,6 +353,24 @@ async def confirm_kyc_signature(driver_id: str):
         }
     )
     
+@api_router.get("/drivers/{driver_id}/kyc-status")
+async def get_kyc_status(driver_id: str):
+    """Récupérer le statut KYC du livreur"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="Livreur non trouvé")
+    
+    contract = driver.get("contract", {})
+    
+    return {
+        "kyc_status": {
+            "contract_generated": contract.get("kyc_contract_generated", False),
+            "contract_sent_date": contract.get("kyc_contract_sent_date"),
+            "contract_signed": contract.get("kyc_contract_signed", False),
+            "contract_received_date": contract.get("kyc_contract_received_date"),
+            "account_status": driver.get("status", "pending")
+        }
+    }
     return {"message": "Contrat KYC validé - Compte livreur activé"}
 
 @api_router.get("/validate-siret/{siret}")
