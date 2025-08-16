@@ -173,6 +173,13 @@ async def update_driver(driver_id: str, driver_update: DriverUpdate):
     if not driver:
         raise HTTPException(status_code=404, detail="Livreur non trouvé")
     
+    # Validation SIRET si fourni
+    if driver_update.business_info and driver_update.business_info.siret:
+        import re
+        siret_clean = driver_update.business_info.siret.replace(" ", "")
+        if not re.match(r"^\d{14}$", siret_clean):
+            raise HTTPException(status_code=400, detail="SIRET invalide (14 chiffres requis)")
+    
     update_data = {"updated_at": datetime.utcnow()}
     
     if driver_update.profile:
@@ -195,6 +202,9 @@ async def update_driver(driver_id: str, driver_update: DriverUpdate):
         {"$set": update_data}
     )
     
+    updated_driver = await db.drivers.find_one({"id": driver_id})
+    return Driver(**updated_driver)
+
 # Statistics and Dashboard Routes
 @api_router.get("/drivers/{driver_id}/stats")
 async def get_driver_stats(driver_id: str):
@@ -236,9 +246,6 @@ async def get_driver_stats(driver_id: str):
     stats["document_status"]["siret_verified"] = business_info.get("siret_verified", False)
     
     return stats
-
-    updated_driver = await db.drivers.find_one({"id": driver_id})
-    return Driver(**updated_driver)
 
 @api_router.post("/drivers/{driver_id}/upload-document")
 async def upload_document(driver_id: str, document_type: str, file: UploadFile = File(...)):
