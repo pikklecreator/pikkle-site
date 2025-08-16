@@ -671,11 +671,21 @@ def main():
     
     # Run validation tests
     print("\n📋 PHASE 5: Validation Security Tests")
+    print("\n🔒 Phase 5.1: Email Jetable Tests (Should REJECT)")
+    tester.test_validation_disposable_emails()
+    
+    print("\n🔒 Phase 5.2: Phone Surtaxé Tests (Should REJECT)")
     tester.test_validation_email_invalid()
     tester.test_validation_phone_invalid()
+    
+    print("\n🔒 Phase 5.3: Phone Valid Tests (Should ACCEPT)")
+    tester.test_validation_phone_valid()
+    
+    print("\n🔒 Phase 5.4: SIRET API Validation Tests")
+    tester.test_siret_api_validation()
+    
+    print("\n🔒 Phase 5.5: Other Validation Tests")
     tester.test_validation_names_too_short()
-    if tester.driver_id:
-        tester.test_validation_siret_invalid()
     tester.test_validation_positive_cases()
     tester.test_bypass_prevention()
     
