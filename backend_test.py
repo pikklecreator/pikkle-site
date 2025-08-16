@@ -132,27 +132,27 @@ class PikklesAPITester:
         )[0]
 
     def test_update_driver_step3(self):
-        """Test updating driver with step 3 data (professional documents)"""
+        """Test updating driver with step 3 data (SIRET business info)"""
         if not self.driver_id:
             print("❌ No driver ID available for testing")
             return False
             
-        pro_docs_data = {
-            "documents": {
-                "driving_license": "uploads/test/driving_license.jpg",
-                "vehicle_insurance": "uploads/test/insurance.pdf",
-                "criminal_record": "uploads/test/criminal_record.pdf",
-                "vehicle_registration": "uploads/test/vehicle_reg.pdf"
+        business_data = {
+            "business_info": {
+                "siret": "12345678901234",
+                "company_name": "Jean Dupont Auto-Entrepreneur",
+                "business_address": "123 Rue de la Paix, 75001 Paris",
+                "siret_verified": False
             },
             "registration_step": 3
         }
         
         return self.run_test(
-            "Update Driver - Step 3 (Professional Documents)",
+            "Update Driver - Step 3 (SIRET Business Info)",
             "PUT",
             f"drivers/{self.driver_id}",
             200,
-            data=pro_docs_data
+            data=business_data
         )[0]
 
     def test_update_driver_step4(self):
