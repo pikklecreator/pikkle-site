@@ -263,16 +263,66 @@ const DriverRegistration = ({ onDriverRegistered }) => {
   };
 
   const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    // Validation email renforcée
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const disposableEmails = ['10minutemail.com', 'guerrillamail.com', 'tempmail.org'];
+    
+    if (!emailRegex.test(email)) return false;
+    
+    const domain = email.split('@')[1];
+    return !disposableEmails.includes(domain);
   };
 
   const validatePhone = (phone) => {
-    // Format français : 06/07/01/02/03/04/05/08/09 + 8 chiffres
-    return /^0[1-9]([0-9]{8})$/.test(phone.replace(/\s/g, ''));
+    // Validation téléphone français renforcée
+    const phoneClean = phone.replace(/\s/g, '');
+    
+    // Format français : 06/07 (mobiles) ou 01/02/03/04/05/09 (fixes)
+    const mobileRegex = /^0[67]([0-9]{8})$/;
+    const landlineRegex = /^0[1-5,9]([0-9]{8})$/;
+    
+    return mobileRegex.test(phoneClean) || landlineRegex.test(phoneClean);
   };
 
   const validatePostalCode = (code) => {
     return /^[0-9]{5}$/.test(code);
+  };
+
+  // Validation SIRET avancée
+  const validateSIRETAdvanced = async (siret) => {
+    const siretClean = siret.replace(/\s/g, '');
+    
+    // Validation format basique
+    if (!/^\d{14}$/.test(siretClean)) return false;
+    
+    // Algorithme de validation SIRET (Luhn modifié)
+    const siren = siretClean.substring(0, 9);
+    const nic = siretClean.substring(9, 14);
+    
+    // Calcul clé de contrôle SIREN
+    let sum = 0;
+    for (let i = 0; i < siren.length; i++) {
+      let digit = parseInt(siren[i]);
+      if (i % 2 === 1) {
+        digit *= 2;
+        if (digit > 9) digit = Math.floor(digit / 10) + (digit % 10);
+      }
+      sum += digit;
+    }
+    
+    return (sum % 10) === 0;
+  };
+
+  const checkSIRETWithAPI = async (siret) => {
+    try {
+      // Simulation API INSEE (en production, utiliser la vraie API)
+      const response = await fetch(`${API}/validate-siret/${siret}`);
+      const data = await response.json();
+      return data.isValid && data.isActive;
+    } catch (error) {
+      console.error('Erreur validation SIRET:', error);
+      return validateSIRETAdvanced(siret);
+    }
   };
 
   const canProceedToNext = () => {
