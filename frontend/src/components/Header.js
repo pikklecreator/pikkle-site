@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
-import { User, LogOut, Truck } from 'lucide-react';
+import { User, LogOut, Truck, FileText } from 'lucide-react';
 
 const Header = ({ currentDriver, onLogout }) => {
   return (
