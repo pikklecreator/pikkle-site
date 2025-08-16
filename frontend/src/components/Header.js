@@ -49,12 +49,12 @@ const Header = ({ currentDriver, onLogout }) => {
           </nav>
 
           {/* Auth Section */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             {currentDriver ? (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-4">
                 <Link 
                   to="/dashboard" 
-                  className="flex items-center space-x-2 text-gray-700 hover:text-green-600 transition-colors"
+                  className="flex items-center space-x-2 text-gray-700 hover:text-green-600 transition-colors font-medium"
                 >
                   <User className="h-4 w-4" />
                   <span className="hidden sm:block">
@@ -65,16 +65,16 @@ const Header = ({ currentDriver, onLogout }) => {
                   variant="outline" 
                   size="sm" 
                   onClick={onLogout}
-                  className="flex items-center space-x-1 border-green-300 text-green-600 hover:bg-green-50"
+                  className="flex items-center space-x-2 border-green-300 text-green-600 hover:bg-green-50"
                 >
                   <LogOut className="h-4 w-4" />
                   <span className="hidden sm:block">Déconnexion</span>
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-4">
                 <Link to="/inscription-livreur">
-                  <Button size="sm" className="btn-primary">
+                  <Button size="sm" className="btn-primary px-6 py-2">
                     Devenir Livreur Pikkles
                   </Button>
                 </Link>
