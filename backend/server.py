@@ -44,6 +44,9 @@ class DriverDocuments(BaseModel):
     identity_card_back: Optional[str] = None
     proof_of_residence: Optional[str] = None
     residence_permit: Optional[str] = None
+    civil_liability_insurance: Optional[str] = None
+    vehicle_insurance: Optional[str] = None
+    vehicle_contract: Optional[str] = None
     kbis_document: Optional[str] = None
 
 class DriverBusinessInfo(BaseModel):
