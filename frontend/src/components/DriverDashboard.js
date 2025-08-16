@@ -307,25 +307,36 @@ const DriverDashboard = ({ driver }) => {
                   </div>
 
                   <div className="space-y-4">
-                    <h4 className="font-medium text-gray-900">Documents professionnels</h4>
+                    <h4 className="font-medium text-gray-900">Statut indépendant</h4>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-sm">Permis de conduire</span>
-                        {getDocumentStatus(driver.documents?.driving_license)}
+                        <span className="text-sm">SIRET fourni</span>
+                        {getDocumentStatus(driver.business_info?.siret)}
                       </div>
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-sm">Assurance véhicule</span>
-                        {getDocumentStatus(driver.documents?.vehicle_insurance)}
+                        <span className="text-sm">SIRET vérifié</span>
+                        {stats?.document_status?.siret_verified ? (
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                        ) : (
+                          <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                        )}
                       </div>
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-sm">Casier judiciaire (B3)</span>
-                        {getDocumentStatus(driver.documents?.criminal_record)}
-                      </div>
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-sm">Carte grise</span>
-                        {getDocumentStatus(driver.documents?.vehicle_registration)}
+                        <span className="text-sm">K-bis / Attestation URSSAF</span>
+                        {getDocumentStatus(driver.documents?.kbis_document)}
                       </div>
                     </div>
+                    
+                    {driver.business_info && (
+                      <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                        <p className="text-sm text-green-700">
+                          <strong>Entreprise :</strong> {driver.business_info.company_name}
+                        </p>
+                        <p className="text-sm text-green-600 mt-1">
+                          <strong>SIRET :</strong> {driver.business_info.siret}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
