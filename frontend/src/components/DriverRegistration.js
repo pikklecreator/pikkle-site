@@ -484,12 +484,20 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   <Input
                     id="postal_code"
                     value={profileData.postal_code}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, postal_code: e.target.value.replace(/\D/g, '').slice(0, 5) }))}
+                    onChange={(e) => {
+                      const code = e.target.value.replace(/\D/g, '').slice(0, 5);
+                      setProfileData(prev => ({ ...prev, postal_code: code }));
+                    }}
                     placeholder="75001"
                     required
-                    className="focus:border-green-500 focus:ring-green-500"
+                    className={`focus:border-green-500 focus:ring-green-500 ${
+                      profileData.postal_code && !validatePostalCode(profileData.postal_code) ? 'border-red-500' : ''
+                    }`}
                     maxLength={5}
                   />
+                  {profileData.postal_code && !validatePostalCode(profileData.postal_code) && (
+                    <p className="text-sm text-red-600">Code postal français requis (5 chiffres)</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="city">Ville *</Label>
