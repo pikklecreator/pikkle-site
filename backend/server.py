@@ -123,7 +123,8 @@ async def create_driver(driver_data: DriverUpdate):
         
         # Validation téléphone français
         phone_clean = re.sub(r'[^\d]', '', profile.phone)
-        if not re.match(r"^0[1-9]\d{8}$", phone_clean):
+        # Exclure les numéros 08 (surtaxés) et valider format français
+        if not re.match(r"^0[1-7,9]\d{8}$", phone_clean):
             raise HTTPException(status_code=400, detail="Numéro de téléphone français invalide")
         
         # Validation noms
@@ -131,6 +132,13 @@ async def create_driver(driver_data: DriverUpdate):
             raise HTTPException(status_code=400, detail="Le prénom doit contenir au moins 2 caractères")
         if len(profile.lastname.strip()) < 2:
             raise HTTPException(status_code=400, detail="Le nom doit contenir au moins 2 caractères")
+        
+        # Validation email renforcée - Bloquer les emails jetables
+        disposable_domains = ['10minutemail.com', 'guerrillamail.com', 'tempmail.org', 
+                              'fake-domain-xyz.com', 'mailinator.com', 'yopmail.com']
+        email_domain = profile.email.split('@')[1].lower()
+        if email_domain in disposable_domains:
+            raise HTTPException(status_code=400, detail="Email jetable non autorisé")
     
     driver_dict = {
         "id": str(uuid.uuid4()),
