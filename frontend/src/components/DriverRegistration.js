@@ -391,9 +391,14 @@ const DriverRegistration = ({ onDriverRegistered }) => {
     }
   };
 
+  const validatePostalCode = (code) => {
+    return /^[0-9]{5}$/.test(code);
+  };
+
   const canProceedToNext = () => {
     switch (currentStep) {
       case 1:
+        const postalCityValid = validatePostalCodeCity(profileData.postal_code, profileData.city);
         return profileData.firstname && profileData.firstname.length >= 2 && 
                profileData.lastname && profileData.lastname.length >= 2 && 
                profileData.email && validateEmail(profileData.email) &&
@@ -401,7 +406,8 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                profileData.street_number && 
                profileData.street_name && profileData.street_name.length >= 3 &&
                profileData.city && profileData.city.length >= 2 &&
-               profileData.postal_code && validatePostalCode(profileData.postal_code);
+               profileData.postal_code && validatePostalCode(profileData.postal_code) &&
+               postalCityValid;
       case 2:
         return documentFiles.identity_card_front && documentFiles.identity_card_back && documentFiles.proof_of_residence;
       case 3:
