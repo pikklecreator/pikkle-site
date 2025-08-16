@@ -271,13 +271,14 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
             <Card className="text-center p-6">
               <CardContent className="pt-6">
                 <Phone className="h-8 w-8 text-green-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Support Livreurs</h3>
-                <p className="text-gray-600">01 23 45 67 89</p>
-                <p className="text-sm text-gray-500 mt-1">Lun-Dim 8h-22h</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Renseignements</h3>
+                <p className="text-gray-600">07 81 90 96 73</p>
+                <p className="text-sm text-gray-500 mt-1">Lun-Ven 9h-18h</p>
+                <p className="text-xs text-amber-600 mt-2">Pour questions générales et inscription</p>
               </CardContent>
             </Card>
 
@@ -285,19 +286,24 @@ const LandingPage = () => {
               <CardContent className="pt-6">
                 <Mail className="h-8 w-8 text-green-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Email</h3>
-                <p className="text-gray-600">livreurs@pikkles.fr</p>
-                <p className="text-sm text-gray-500 mt-1">Réponse sous 4h</p>
+                <p className="text-gray-600">pikkles.delivery@gmail.com</p>
+                <p className="text-sm text-gray-500 mt-1">Réponse sous 24h</p>
+                <p className="text-xs text-amber-600 mt-2">Pour candidatures et partenariats</p>
               </CardContent>
             </Card>
+          </div>
 
-            <Card className="text-center p-6">
-              <CardContent className="pt-6">
-                <MapPin className="h-8 w-8 text-green-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Siège Social</h3>
-                <p className="text-gray-600">42 Rue des Cornichons</p>
-                <p className="text-sm text-gray-500 mt-1">69000 Lyon</p>
-              </CardContent>
-            </Card>
+          <div className="mt-12 text-center">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-6 max-w-2xl mx-auto">
+              <h4 className="text-lg font-semibold text-green-800 mb-2">
+                📞 Support Livreur Dédié
+              </h4>
+              <p className="text-green-700">
+                <strong>Disponible uniquement après validation de votre inscription</strong>
+                <br/>
+                Accès 7j/7 via votre dashboard livreur pour toute assistance technique
+              </p>
+            </div>
           </div>
         </div>
       </section>
