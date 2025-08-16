@@ -560,10 +560,19 @@ def main():
     else:
         print("❌ Driver creation failed, skipping dependent tests")
     
+    # Run validation tests
+    print("\n📋 PHASE 5: Validation Security Tests")
+    tester.test_validation_email_invalid()
+    tester.test_validation_phone_invalid()
+    tester.test_validation_names_too_short()
+    if tester.driver_id:
+        tester.test_validation_siret_invalid()
+    tester.test_validation_positive_cases()
+    tester.test_bypass_prevention()
+    
     # Run error handling tests
-    print("\n📋 PHASE 5: Error Handling Tests")
+    print("\n📋 PHASE 6: Error Handling Tests")
     tester.test_get_nonexistent_driver()
-    tester.test_invalid_driver_creation()
     
     # Print final results
     print("\n" + "=" * 50)
