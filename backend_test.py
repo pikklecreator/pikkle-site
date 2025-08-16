@@ -347,10 +347,15 @@ def main():
         tester.test_update_driver_step4()
         tester.test_update_driver_step5()
         
-        # Test dashboard endpoints
+        # Test dashboard endpoints with SIRET info
         print("\n📋 PHASE 3: Dashboard API Tests")
         tester.test_get_driver_stats()
         tester.test_get_driver_payments()
+        
+        # Test new SIRET functionality
+        print("\n📋 PHASE 4: SIRET Functionality Tests")
+        tester.test_siret_validation()
+        tester.test_kbis_document_upload()
     else:
         print("❌ Driver creation failed, skipping dependent tests")
     
