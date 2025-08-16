@@ -275,8 +275,11 @@ const DriverRegistration = ({ onDriverRegistered }) => {
   };
 
   const validatePhone = (phone) => {
-    // Validation téléphone français renforcée
+    // Validation téléphone français renforcée - Exclure 08
     const phoneClean = phone.replace(/\s/g, '');
+    
+    // Bloquer explicitement les numéros 08 (surtaxés)
+    if (phoneClean.startsWith('08')) return false;
     
     // Format français : 06/07 (mobiles) ou 01/02/03/04/05/09 (fixes)
     const mobileRegex = /^0[67]([0-9]{8})$/;
