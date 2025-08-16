@@ -606,10 +606,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   <Input
                     id="postal_code"
                     value={profileData.postal_code}
-                    onChange={(e) => {
-                      const code = e.target.value.replace(/\D/g, '').slice(0, 5);
-                      setProfileData(prev => ({ ...prev, postal_code: code }));
-                    }}
+                    onChange={(e) => handlePostalCodeChange(e.target.value)}
                     placeholder="75001"
                     required
                     className={`focus:border-green-500 focus:ring-green-500 ${
@@ -620,6 +617,9 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   {profileData.postal_code && !validatePostalCode(profileData.postal_code) && (
                     <p className="text-sm text-red-600">Code postal français requis (5 chiffres)</p>
                   )}
+                  {profileData.postal_code && postalCodeCities[profileData.postal_code] && (
+                    <p className="text-sm text-green-600">✓ Ville détectée : {postalCodeCities[profileData.postal_code]}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="city">Ville *</Label>
@@ -629,8 +629,13 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                     onChange={(e) => setProfileData(prev => ({ ...prev, city: e.target.value }))}
                     placeholder="Paris"
                     required
-                    className="focus:border-green-500 focus:ring-green-500"
+                    className={`focus:border-green-500 focus:ring-green-500 ${
+                      profileData.postal_code && profileData.city && !validatePostalCodeCity(profileData.postal_code, profileData.city) ? 'border-red-500' : ''
+                    }`}
                   />
+                  {profileData.postal_code && profileData.city && !validatePostalCodeCity(profileData.postal_code, profileData.city) && (
+                    <p className="text-sm text-red-600">La ville ne correspond pas au code postal</p>
+                  )}
                 </div>
               </div>
               
