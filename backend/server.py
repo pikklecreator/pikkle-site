@@ -1,15 +1,16 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List
+from pydantic import BaseModel, Field, EmailStr
+from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime
-
+from datetime import datetime, date
+import shutil
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -25,32 +26,221 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Create uploads directory if it doesn't exist
+UPLOAD_DIR = ROOT_DIR / "uploads"
+UPLOAD_DIR.mkdir(exist_ok=True)
 
-# Define Models
-class StatusCheck(BaseModel):
+# Driver Models
+class DriverProfile(BaseModel):
+    firstname: str
+    lastname: str
+    email: EmailStr
+    phone: str
+    date_of_birth: Optional[str] = None
+    address: str
+
+class DriverDocuments(BaseModel):
+    identity_card_front: Optional[str] = None
+    identity_card_back: Optional[str] = None
+    proof_of_residence: Optional[str] = None
+    residence_permit: Optional[str] = None
+    driving_license: Optional[str] = None
+    vehicle_insurance: Optional[str] = None
+    criminal_record: Optional[str] = None
+    vehicle_registration: Optional[str] = None
+
+class DriverBankInfo(BaseModel):
+    bank_name: str
+    iban: str
+    bic: str
+    account_holder_name: str
+
+class DriverContract(BaseModel):
+    auto_entrepreneur_status: bool = False
+    accepts_cgu: bool = False
+    accepts_privacy_policy: bool = False
+    signature_date: Optional[datetime] = None
+
+class Driver(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    profile: Optional[DriverProfile] = None
+    documents: Optional[DriverDocuments] = None
+    bank_info: Optional[DriverBankInfo] = None
+    contract: Optional[DriverContract] = None
+    registration_step: int = 1
+    status: str = "pending"  # pending, under_review, approved, rejected
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class DriverUpdate(BaseModel):
+    profile: Optional[DriverProfile] = None
+    documents: Optional[DriverDocuments] = None
+    bank_info: Optional[DriverBankInfo] = None
+    contract: Optional[DriverContract] = None
+    registration_step: Optional[int] = None
+    status: Optional[str] = None
 
-# Add your routes to the router instead of directly to app
+# Payment Models (placeholder for future Stripe integration)
+class PaymentHistory(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_id: str
+    amount: float
+    currency: str = "EUR"
+    payment_method: str  # apple_pay, google_pay, bank_transfer
+    status: str  # completed, pending, failed
+    delivery_id: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Driver Routes
+@api_router.post("/drivers", response_model=Driver)
+async def create_driver(driver_data: DriverUpdate):
+    """Create a new driver account"""
+    driver_dict = {
+        "id": str(uuid.uuid4()),
+        "registration_step": 1,
+        "status": "pending",
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow()
+    }
+    
+    # Add provided data
+    if driver_data.profile:
+        driver_dict["profile"] = driver_data.profile.dict()
+    if driver_data.documents:
+        driver_dict["documents"] = driver_data.documents.dict()
+    if driver_data.bank_info:
+        driver_dict["bank_info"] = driver_data.bank_info.dict()
+    if driver_data.contract:
+        driver_dict["contract"] = driver_data.contract.dict()
+    if driver_data.registration_step:
+        driver_dict["registration_step"] = driver_data.registration_step
+    
+    driver_obj = Driver(**driver_dict)
+    await db.drivers.insert_one(driver_obj.dict())
+    return driver_obj
+
+@api_router.get("/drivers/{driver_id}", response_model=Driver)
+async def get_driver(driver_id: str):
+    """Get driver by ID"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="Livreur non trouvé")
+    return Driver(**driver)
+
+@api_router.put("/drivers/{driver_id}", response_model=Driver)
+async def update_driver(driver_id: str, driver_update: DriverUpdate):
+    """Update driver information"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="Livreur non trouvé")
+    
+    update_data = {"updated_at": datetime.utcnow()}
+    
+    if driver_update.profile:
+        update_data["profile"] = driver_update.profile.dict()
+    if driver_update.documents:
+        update_data["documents"] = driver_update.documents.dict()
+    if driver_update.bank_info:
+        update_data["bank_info"] = driver_update.bank_info.dict()
+    if driver_update.contract:
+        update_data["contract"] = driver_update.contract.dict()
+    if driver_update.registration_step:
+        update_data["registration_step"] = driver_update.registration_step
+    if driver_update.status:
+        update_data["status"] = driver_update.status
+    
+    await db.drivers.update_one(
+        {"id": driver_id},
+        {"$set": update_data}
+    )
+    
+    updated_driver = await db.drivers.find_one({"id": driver_id})
+    return Driver(**updated_driver)
+
+@api_router.post("/drivers/{driver_id}/upload-document")
+async def upload_document(driver_id: str, document_type: str, file: UploadFile = File(...)):
+    """Upload a document for a driver"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="Livreur non trouvé")
+    
+    # Validate document type
+    valid_document_types = [
+        "identity_card_front", "identity_card_back", "proof_of_residence",
+        "residence_permit", "driving_license", "vehicle_insurance",
+        "criminal_record", "vehicle_registration"
+    ]
+    
+    if document_type not in valid_document_types:
+        raise HTTPException(status_code=400, detail="Type de document invalide")
+    
+    # Create driver-specific upload directory
+    driver_upload_dir = UPLOAD_DIR / driver_id
+    driver_upload_dir.mkdir(exist_ok=True)
+    
+    # Save file
+    file_extension = file.filename.split('.')[-1] if '.' in file.filename else 'jpg'
+    filename = f"{document_type}.{file_extension}"
+    file_path = driver_upload_dir / filename
+    
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    # Update driver documents
+    documents = driver.get("documents", {})
+    documents[document_type] = str(file_path.relative_to(ROOT_DIR))
+    
+    await db.drivers.update_one(
+        {"id": driver_id},
+        {"$set": {"documents": documents, "updated_at": datetime.utcnow()}}
+    )
+    
+    return {"message": "Document uploadé avec succès", "filename": filename}
+
+@api_router.get("/drivers/{driver_id}/payments", response_model=List[PaymentHistory])
+async def get_driver_payments(driver_id: str):
+    """Get payment history for a driver"""
+    payments = await db.payments.find({"driver_id": driver_id}).to_list(100)
+    return [PaymentHistory(**payment) for payment in payments]
+
+# Statistics and Dashboard Routes
+@api_router.get("/drivers/{driver_id}/stats")
+async def get_driver_stats(driver_id: str):
+    """Get driver statistics for dashboard"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="Livreur non trouvé")
+    
+    # Mock stats for now - will be replaced with real data
+    stats = {
+        "total_deliveries": 0,
+        "total_earnings": 0.0,
+        "current_balance": 0.0,
+        "document_status": {
+            "identity_verified": bool(driver.get("documents", {}).get("identity_card_front")),
+            "documents_complete": False,
+            "bank_info_complete": bool(driver.get("bank_info")),
+            "contract_signed": bool(driver.get("contract", {}).get("accepts_cgu"))
+        },
+        "next_payout_date": "2024-08-15",
+        "account_status": driver.get("status", "pending")
+    }
+    
+    # Check document completeness
+    documents = driver.get("documents", {})
+    required_docs = ["identity_card_front", "proof_of_residence", "driving_license", "vehicle_insurance"]
+    stats["document_status"]["documents_complete"] = all(documents.get(doc) for doc in required_docs)
+    
+    return stats
+
+# General Routes
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "API Pikkles - Plateforme de Livraison"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+@api_router.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.utcnow()}
 
 # Include the router in the main app
 app.include_router(api_router)
