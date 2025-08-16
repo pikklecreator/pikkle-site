@@ -112,6 +112,26 @@ class PaymentHistory(BaseModel):
 @api_router.post("/drivers", response_model=Driver)
 async def create_driver(driver_data: DriverUpdate):
     """Create a new driver account"""
+    
+    # Validation côté serveur
+    if driver_data.profile:
+        profile = driver_data.profile
+        # Validation email
+        import re
+        if not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", profile.email):
+            raise HTTPException(status_code=400, detail="Format email invalide")
+        
+        # Validation téléphone français
+        phone_clean = re.sub(r'[^\d]', '', profile.phone)
+        if not re.match(r"^0[1-9]\d{8}$", phone_clean):
+            raise HTTPException(status_code=400, detail="Numéro de téléphone français invalide")
+        
+        # Validation noms
+        if len(profile.firstname.strip()) < 2:
+            raise HTTPException(status_code=400, detail="Le prénom doit contenir au moins 2 caractères")
+        if len(profile.lastname.strip()) < 2:
+            raise HTTPException(status_code=400, detail="Le nom doit contenir au moins 2 caractères")
+    
     driver_dict = {
         "id": str(uuid.uuid4()),
         "registration_step": 1,
