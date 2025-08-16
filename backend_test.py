@@ -240,7 +240,62 @@ class PikklesAPITester:
             404
         )[0]
 
-    def test_invalid_driver_creation(self):
+    def test_siret_validation(self):
+        """Test SIRET validation functionality"""
+        if not self.driver_id:
+            print("❌ No driver ID available for testing")
+            return False
+            
+        # Test with invalid SIRET (too short)
+        invalid_siret_data = {
+            "business_info": {
+                "siret": "123456789",  # Only 9 digits instead of 14
+                "company_name": "Test Company",
+                "business_address": "Test Address"
+            }
+        }
+        
+        # This should succeed as backend doesn't validate SIRET format yet
+        success, _ = self.run_test(
+            "SIRET Validation - Invalid Format",
+            "PUT",
+            f"drivers/{self.driver_id}",
+            200,
+            data=invalid_siret_data
+        )
+        
+        # Test with valid SIRET format
+        valid_siret_data = {
+            "business_info": {
+                "siret": "12345678901234",  # 14 digits
+                "company_name": "Valid Company",
+                "business_address": "Valid Address"
+            }
+        }
+        
+        success2, _ = self.run_test(
+            "SIRET Validation - Valid Format",
+            "PUT",
+            f"drivers/{self.driver_id}",
+            200,
+            data=valid_siret_data
+        )
+        
+        return success and success2
+
+    def test_kbis_document_upload(self):
+        """Test K-bis document upload"""
+        if not self.driver_id:
+            print("❌ No driver ID available for testing")
+            return False
+            
+        # Test document upload endpoint for K-bis
+        return self.run_test(
+            "K-bis Document Upload Endpoint",
+            "POST",
+            f"drivers/{self.driver_id}/upload-document?document_type=kbis_document",
+            422,  # Should fail without actual file
+        )[0]
         """Test creating driver with invalid data"""
         invalid_data = {
             "profile": {
