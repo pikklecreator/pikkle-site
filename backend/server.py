@@ -44,10 +44,13 @@ class DriverDocuments(BaseModel):
     identity_card_back: Optional[str] = None
     proof_of_residence: Optional[str] = None
     residence_permit: Optional[str] = None
-    driving_license: Optional[str] = None
-    vehicle_insurance: Optional[str] = None
-    criminal_record: Optional[str] = None
-    vehicle_registration: Optional[str] = None
+    kbis_document: Optional[str] = None
+
+class DriverBusinessInfo(BaseModel):
+    siret: str
+    company_name: str
+    business_address: str
+    siret_verified: bool = False
 
 class DriverBankInfo(BaseModel):
     bank_name: str
@@ -59,12 +62,14 @@ class DriverContract(BaseModel):
     auto_entrepreneur_status: bool = False
     accepts_cgu: bool = False
     accepts_privacy_policy: bool = False
+    accepts_app_download: bool = False
     signature_date: Optional[datetime] = None
 
 class Driver(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     profile: Optional[DriverProfile] = None
     documents: Optional[DriverDocuments] = None
+    business_info: Optional[DriverBusinessInfo] = None
     bank_info: Optional[DriverBankInfo] = None
     contract: Optional[DriverContract] = None
     registration_step: int = 1
@@ -75,6 +80,7 @@ class Driver(BaseModel):
 class DriverUpdate(BaseModel):
     profile: Optional[DriverProfile] = None
     documents: Optional[DriverDocuments] = None
+    business_info: Optional[DriverBusinessInfo] = None
     bank_info: Optional[DriverBankInfo] = None
     contract: Optional[DriverContract] = None
     registration_step: Optional[int] = None
