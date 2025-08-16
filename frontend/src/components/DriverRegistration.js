@@ -307,7 +307,7 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                 <div>
                   <p className="text-sm font-medium text-green-800">Livreur Indépendant Pikkles</p>
                   <p className="text-sm text-green-600 mt-1">
-                    Vous devez posséder un SIRET pour travailler avec nous
+                    Remplissez tous les champs obligatoires pour votre inscription
                   </p>
                 </div>
               </div>
@@ -376,17 +376,71 @@ const DriverRegistration = ({ onDriverRegistered }) => {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="address">Adresse personnelle *</Label>
-              <Textarea
-                id="address"
-                value={profileData.address}
-                onChange={(e) => setProfileData(prev => ({ ...prev, address: e.target.value }))}
-                placeholder="Numéro, rue, ville, code postal..."
-                rows={3}
-                required
-                className="focus:border-green-500 focus:ring-green-500"
-              />
+            {/* Adresse détaillée */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-800 mb-4">Adresse personnelle *</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="street_number">Numéro *</Label>
+                  <Input
+                    id="street_number"
+                    value={profileData.street_number}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, street_number: e.target.value }))}
+                    placeholder="123"
+                    required
+                    className="focus:border-green-500 focus:ring-green-500"
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="street_name">Nom de la rue *</Label>
+                  <Input
+                    id="street_name"
+                    value={profileData.street_name}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, street_name: e.target.value }))}
+                    placeholder="Rue de la Paix"
+                    required
+                    className="focus:border-green-500 focus:ring-green-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="postal_code">Code postal *</Label>
+                  <Input
+                    id="postal_code"
+                    value={profileData.postal_code}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, postal_code: e.target.value.replace(/\D/g, '').slice(0, 5) }))}
+                    placeholder="75001"
+                    required
+                    className="focus:border-green-500 focus:ring-green-500"
+                    maxLength={5}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="city">Ville *</Label>
+                  <Input
+                    id="city"
+                    value={profileData.city}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, city: e.target.value }))}
+                    placeholder="Paris"
+                    required
+                    className="focus:border-green-500 focus:ring-green-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="mt-4 space-y-2">
+                <Label htmlFor="country">Pays</Label>
+                <Input
+                  id="country"
+                  value={profileData.country}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, country: e.target.value }))}
+                  placeholder="France"
+                  className="focus:border-green-500 focus:ring-green-500"
+                  disabled
+                />
+              </div>
             </div>
           </div>
         );
