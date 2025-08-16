@@ -343,65 +343,188 @@ class PikklesAPITester:
         
         return success1 and success2 and success3
 
-    def test_invalid_driver_creation(self):
-        """Test creating driver with invalid data"""
-        invalid_data = {
-            "profile": {
-                "firstname": "",  # Empty firstname should fail validation
-                "email": "invalid-email"  # Invalid email format
+    def test_validation_email_invalid(self):
+        """Test email validation - should reject invalid emails"""
+        invalid_emails = ["test", "test@", "@test.com", "test.com", "test@test"]
+        
+        for email in invalid_emails:
+            invalid_data = {
+                "profile": {
+                    "firstname": "Jean",
+                    "lastname": "Dupont", 
+                    "email": email,
+                    "phone": "0612345678"
+                }
             }
-        }
-        
-        # This should either return 422 (validation error) or 400 (bad request)
-        success_422, _ = self.run_test(
-            "Create Driver - Invalid Data (expecting 422)",
-            "POST",
-            "drivers",
-            422,
-            data=invalid_data
-        )
-        
-        if not success_422:
-            # Try 400 as alternative
-            success_400, _ = self.run_test(
-                "Create Driver - Invalid Data (expecting 400)",
+            
+            success, _ = self.run_test(
+                f"Email Validation - Invalid: {email}",
                 "POST",
                 "drivers",
                 400,
                 data=invalid_data
             )
-            return success_400
+            
+            if not success:
+                print(f"❌ Email validation failed for: {email}")
+                return False
         
-        return success_422
-        """Test creating driver with invalid data"""
-        invalid_data = {
-            "profile": {
-                "firstname": "",  # Empty firstname should fail validation
-                "email": "invalid-email"  # Invalid email format
+        return True
+
+    def test_validation_phone_invalid(self):
+        """Test phone validation - should reject non-French phones"""
+        invalid_phones = ["123", "+33123456789", "1234567890", "0812345678", "0012345678"]
+        
+        for phone in invalid_phones:
+            invalid_data = {
+                "profile": {
+                    "firstname": "Jean",
+                    "lastname": "Dupont",
+                    "email": "jean@test.com",
+                    "phone": phone
+                }
             }
-        }
-        
-        # This should either return 422 (validation error) or 400 (bad request)
-        success_422, _ = self.run_test(
-            "Create Driver - Invalid Data (expecting 422)",
-            "POST",
-            "drivers",
-            422,
-            data=invalid_data
-        )
-        
-        if not success_422:
-            # Try 400 as alternative
-            success_400, _ = self.run_test(
-                "Create Driver - Invalid Data (expecting 400)",
-                "POST",
+            
+            success, _ = self.run_test(
+                f"Phone Validation - Invalid: {phone}",
+                "POST", 
                 "drivers",
                 400,
                 data=invalid_data
             )
-            return success_400
+            
+            if not success:
+                print(f"❌ Phone validation failed for: {phone}")
+                return False
         
-        return success_422
+        return True
+
+    def test_validation_names_too_short(self):
+        """Test name validation - should reject names < 2 chars"""
+        invalid_names = [
+            {"firstname": "A", "lastname": "Dupont"},
+            {"firstname": "Jean", "lastname": "B"},
+            {"firstname": "", "lastname": "Dupont"},
+            {"firstname": "Jean", "lastname": ""}
+        ]
+        
+        for names in invalid_names:
+            invalid_data = {
+                "profile": {
+                    "firstname": names["firstname"],
+                    "lastname": names["lastname"],
+                    "email": "jean@test.com",
+                    "phone": "0612345678"
+                }
+            }
+            
+            success, _ = self.run_test(
+                f"Name Validation - Invalid: {names['firstname']}/{names['lastname']}",
+                "POST",
+                "drivers", 
+                400,
+                data=invalid_data
+            )
+            
+            if not success:
+                print(f"❌ Name validation failed for: {names}")
+                return False
+        
+        return True
+
+    def test_validation_siret_invalid(self):
+        """Test SIRET validation - should reject invalid SIRETs"""
+        if not self.driver_id:
+            print("❌ No driver ID available for testing")
+            return False
+            
+        invalid_sirets = ["123456789", "12345678901234567", "abcd1234567890", "123 456 789"]
+        
+        for siret in invalid_sirets:
+            invalid_data = {
+                "business_info": {
+                    "siret": siret,
+                    "company_name": "Test Company",
+                    "business_address": "Test Address"
+                }
+            }
+            
+            success, _ = self.run_test(
+                f"SIRET Validation - Invalid: {siret}",
+                "PUT",
+                f"drivers/{self.driver_id}",
+                400,
+                data=invalid_data
+            )
+            
+            if not success:
+                print(f"❌ SIRET validation failed for: {siret}")
+                return False
+        
+        return True
+
+    def test_validation_positive_cases(self):
+        """Test that valid data passes validation"""
+        valid_data = {
+            "profile": {
+                "firstname": "Jean",
+                "lastname": "Dupont",
+                "email": "jean.dupont@gmail.com", 
+                "phone": "0612345678"
+            }
+        }
+        
+        success, response = self.run_test(
+            "Valid Data - Should Pass",
+            "POST",
+            "drivers",
+            200,
+            data=valid_data
+        )
+        
+        if success and 'id' in response:
+            # Test valid SIRET update
+            valid_siret_data = {
+                "business_info": {
+                    "siret": "12345678901234",
+                    "company_name": "Jean Dupont Auto-Entrepreneur", 
+                    "business_address": "123 Rue de la Paix, 75001 Paris"
+                }
+            }
+            
+            success2, _ = self.run_test(
+                "Valid SIRET - Should Pass",
+                "PUT",
+                f"drivers/{response['id']}",
+                200,
+                data=valid_siret_data
+            )
+            
+            return success2
+        
+        return False
+
+    def test_bypass_prevention(self):
+        """Test that validation cannot be bypassed"""
+        # Try to create with random data like "aaa", "bbb", "ccc"
+        bypass_data = {
+            "profile": {
+                "firstname": "aaa",
+                "lastname": "bbb", 
+                "email": "ccc",
+                "phone": "ddd"
+            }
+        }
+        
+        success, _ = self.run_test(
+            "Bypass Prevention - Random Data",
+            "POST",
+            "drivers",
+            400,
+            data=bypass_data
+        )
+        
+        return success
 
 def main():
     print("🚀 Starting Pikkles API Backend Tests")
