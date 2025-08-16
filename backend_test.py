@@ -408,8 +408,16 @@ class PikklesAPITester:
         return True
 
     def test_validation_phone_invalid(self):
-        """Test phone validation - should reject non-French phones"""
-        invalid_phones = ["123", "+33123456789", "1234567890", "0812345678", "0012345678"]
+        """Test phone validation - should reject non-French phones and 08 numbers"""
+        invalid_phones = [
+            "123", 
+            "+33123456789", 
+            "1234567890", 
+            "0812345678",  # Surtaxé 08
+            "0823456789",  # Surtaxé 08
+            "0834567890",  # Surtaxé 08
+            "0012345678"
+        ]
         
         for phone in invalid_phones:
             invalid_data = {
@@ -434,6 +442,43 @@ class PikklesAPITester:
                 print(f"✅ Phone validation working for: {phone}")
             else:
                 print(f"❌ Phone validation failed for: {phone}")
+                return False
+        
+        return True
+
+    def test_validation_phone_valid(self):
+        """Test phone validation - should accept valid French phones"""
+        valid_phones = [
+            "0612345678",  # Mobile 06
+            "0787654321",  # Mobile 07
+            "0123456789",  # Fixe 01
+            "0445678901",  # Fixe 04
+            "0987654321"   # Fixe 09
+        ]
+        
+        for phone in valid_phones:
+            valid_data = {
+                "profile": {
+                    "firstname": "Jean",
+                    "lastname": "Dupont",
+                    "email": "jean@test.com",
+                    "phone": phone,
+                    "address": "123 Rue de la Paix, 75001 Paris"
+                }
+            }
+            
+            success, response = self.run_test(
+                f"Phone Validation - Valid: {phone}",
+                "POST",
+                "drivers",
+                200,  # Should succeed
+                data=valid_data
+            )
+            
+            if success and 'id' in response:
+                print(f"✅ Valid phone accepted: {phone}")
+            else:
+                print(f"❌ Valid phone validation failed for: {phone}")
                 return False
         
         return True
