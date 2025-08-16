@@ -243,7 +243,10 @@ async def get_driver_stats(driver_id: str):
     documents = driver.get("documents", {})
     business_info = driver.get("business_info", {})
     required_docs = ["identity_card_front", "identity_card_back", "proof_of_residence"]
+    insurance_docs = ["civil_liability_insurance", "vehicle_insurance", "vehicle_contract"]
+    
     stats["document_status"]["documents_complete"] = all(documents.get(doc) for doc in required_docs)
+    stats["document_status"]["insurance_complete"] = all(documents.get(doc) for doc in insurance_docs)
     stats["document_status"]["siret_provided"] = bool(business_info.get("siret"))
     stats["document_status"]["siret_verified"] = business_info.get("siret_verified", False)
     
