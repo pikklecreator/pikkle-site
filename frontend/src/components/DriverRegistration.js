@@ -371,8 +371,13 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   onChange={(e) => setProfileData(prev => ({ ...prev, firstname: e.target.value }))}
                   placeholder="Votre prénom"
                   required
-                  className="focus:border-green-500 focus:ring-green-500"
+                  className={`focus:border-green-500 focus:ring-green-500 ${
+                    profileData.firstname && profileData.firstname.length < 2 ? 'border-red-500' : ''
+                  }`}
                 />
+                {profileData.firstname && profileData.firstname.length < 2 && (
+                  <p className="text-sm text-red-600">Le prénom doit contenir au moins 2 caractères</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lastname">Nom *</Label>
@@ -382,8 +387,13 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   onChange={(e) => setProfileData(prev => ({ ...prev, lastname: e.target.value }))}
                   placeholder="Votre nom"
                   required
-                  className="focus:border-green-500 focus:ring-green-500"
+                  className={`focus:border-green-500 focus:ring-green-500 ${
+                    profileData.lastname && profileData.lastname.length < 2 ? 'border-red-500' : ''
+                  }`}
                 />
+                {profileData.lastname && profileData.lastname.length < 2 && (
+                  <p className="text-sm text-red-600">Le nom doit contenir au moins 2 caractères</p>
+                )}
               </div>
             </div>
 
