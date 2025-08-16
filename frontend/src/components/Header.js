@@ -8,27 +8,27 @@ const Header = ({ currentDriver, onLogout }) => {
     <header className="bg-white shadow-sm border-b border-green-200 sticky top-0 z-50">
       <div className="container mx-auto px-6">
         <div className="flex justify-between items-center h-18 py-2">
-          {/* Logo avec image cornichon */}
+          {/* Logo simplifié et propre */}
           <Link to="/" className="flex items-center space-x-3">
             <div className="relative">
               <img 
                 src="https://customer-assets.emergentagent.com/job_driver-signup/artifacts/7fbxvm54_PIKKLES.webp" 
-                alt="Pikkles Logo"
-                className="h-10 w-auto"
+                alt="Pikkles"
+                className="h-12 w-auto"
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'flex';
                 }}
               />
-              <div className="hidden bg-gradient-to-r from-green-500 to-green-600 p-2 rounded-lg">
+              <div className="hidden bg-gradient-to-r from-green-500 to-green-600 p-3 rounded-xl shadow-lg">
                 <Truck className="h-6 w-6 text-white" />
               </div>
             </div>
-            <div>
-              <span className="text-2xl font-bold pickle-text-gradient">
+            <div className="hidden sm:block">
+              <span className="text-2xl font-bold pickle-text-gradient tracking-tight">
                 Pikkles
               </span>
-              <p className="text-xs text-green-600 -mt-1">Livraison verte</p>
+              <p className="text-xs text-green-600 -mt-1 font-medium">Livraison verte</p>
             </div>
           </Link>
 
