@@ -369,6 +369,44 @@ class PikklesAPITester:
         
         return True
 
+    def test_validation_disposable_emails(self):
+        """Test disposable email validation - should reject disposable emails"""
+        disposable_emails = [
+            "test@10minutemail.com",
+            "user@guerrillamail.com", 
+            "fake@tempmail.org",
+            "test@mailinator.com",
+            "user@yopmail.com",
+            "test@fake-domain-xyz.com"
+        ]
+        
+        for email in disposable_emails:
+            invalid_data = {
+                "profile": {
+                    "firstname": "Jean",
+                    "lastname": "Dupont",
+                    "email": email,
+                    "phone": "0612345678", 
+                    "address": "123 Rue de la Paix, 75001 Paris"
+                }
+            }
+            
+            success, response = self.run_test(
+                f"Disposable Email Validation - Should Reject: {email}",
+                "POST",
+                "drivers",
+                400,  # Backend validation returns 400
+                data=invalid_data
+            )
+            
+            if success and "jetable" in str(response):
+                print(f"✅ Disposable email blocked: {email}")
+            else:
+                print(f"❌ Disposable email validation failed for: {email}")
+                return False
+        
+        return True
+
     def test_validation_phone_invalid(self):
         """Test phone validation - should reject non-French phones"""
         invalid_phones = ["123", "+33123456789", "1234567890", "0812345678", "0012345678"]
