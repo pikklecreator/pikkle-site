@@ -218,11 +218,92 @@ async def upload_document(driver_id: str, document_type: str, file: UploadFile =
     
     return {"message": "Document uploadé avec succès", "filename": filename}
 
-@api_router.get("/drivers/{driver_id}/payments", response_model=List[PaymentHistory])
-async def get_driver_payments(driver_id: str):
-    """Get payment history for a driver"""
-    payments = await db.payments.find({"driver_id": driver_id}).to_list(100)
-    return [PaymentHistory(**payment) for payment in payments]
+@api_router.post("/drivers/{driver_id}/generate-kyc-contract")
+async def generate_kyc_contract(driver_id: str):
+    """Générer le contrat KYC personnalisé pour le livreur"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="Livreur non trouvé")
+    
+    # Vérifier que tous les documents sont validés
+    if driver.get("status") != "approved":
+        raise HTTPException(status_code=400, detail="Documents non validés")
+    
+    # Extraire les données du livreur
+    profile = driver.get("profile", {})
+    business = driver.get("business_info", {})
+    contract_data = driver.get("contract", {})
+    
+    # Template du contrat KYC avec variables
+    contract_template = {
+        "full_name": f"{profile.get('firstname', '')} {profile.get('lastname', '')}",
+        "address": f"{profile.get('street_number', '')} {profile.get('street_name', '')}, {profile.get('postal_code', '')} {profile.get('city', '')}, {profile.get('country', 'France')}",
+        "tax_id": business.get("siret", ""),
+        "vehicle_type": business.get("vehicle_type", "À préciser"),
+        "insurance_provider": business.get("insurance_provider", "À préciser"),
+        "insurance_number": business.get("insurance_number", "À préciser"),
+        "commission_rate": contract_data.get("commission_rate", 15.0),
+        "date": datetime.utcnow().strftime("%d/%m/%Y"),
+        "contract_id": f"PKL-{driver_id[:8].upper()}-{datetime.utcnow().strftime('%Y%m%d')}"
+    }
+    
+    # Marquer le contrat comme généré
+    await db.drivers.update_one(
+        {"id": driver_id},
+        {
+            "$set": {
+                "contract.kyc_contract_generated": True,
+                "contract.kyc_contract_sent_date": datetime.utcnow(),
+                "status": "contract_pending"
+            }
+        }
+    )
+    
+    return {
+        "message": "Contrat KYC généré avec succès",
+        "contract_data": contract_template,
+        "status": "contract_sent"
+    }
+
+@api_router.post("/drivers/{driver_id}/confirm-kyc-signature")
+async def confirm_kyc_signature(driver_id: str):
+    """Confirmer la réception du contrat KYC signé"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="Livreur non trouvé")
+    
+    # Marquer le contrat comme signé et reçu
+    await db.drivers.update_one(
+        {"id": driver_id},
+        {
+            "$set": {
+                "contract.kyc_contract_signed": True,
+                "contract.kyc_contract_received_date": datetime.utcnow(),
+                "status": "active"
+            }
+        }
+    )
+    
+    return {"message": "Contrat KYC validé - Compte livreur activé"}
+
+@api_router.get("/drivers/{driver_id}/kyc-status")
+async def get_kyc_status(driver_id: str):
+    """Récupérer le statut KYC du livreur"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="Livreur non trouvé")
+    
+    contract = driver.get("contract", {})
+    
+    return {
+        "kyc_status": {
+            "contract_generated": contract.get("kyc_contract_generated", False),
+            "contract_sent_date": contract.get("kyc_contract_sent_date"),
+            "contract_signed": contract.get("kyc_contract_signed", False),
+            "contract_received_date": contract.get("kyc_contract_received_date"),
+            "account_status": driver.get("status", "pending")
+        }
+    }
 
 # Statistics and Dashboard Routes
 @api_router.get("/drivers/{driver_id}/stats")
