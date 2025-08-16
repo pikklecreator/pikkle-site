@@ -237,8 +237,11 @@ async def get_driver_stats(driver_id: str):
     
     # Check document completeness
     documents = driver.get("documents", {})
-    required_docs = ["identity_card_front", "proof_of_residence", "driving_license", "vehicle_insurance"]
+    business_info = driver.get("business_info", {})
+    required_docs = ["identity_card_front", "identity_card_back", "proof_of_residence"]
     stats["document_status"]["documents_complete"] = all(documents.get(doc) for doc in required_docs)
+    stats["document_status"]["siret_provided"] = bool(business_info.get("siret"))
+    stats["document_status"]["siret_verified"] = business_info.get("siret_verified", False)
     
     return stats
 
