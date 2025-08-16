@@ -88,11 +88,11 @@ const Footer = () => {
             <div className="flex items-center space-x-6 mb-4 md:mb-0">
               <div className="flex items-center space-x-2 text-gray-300">
                 <Mail className="h-4 w-4" />
-                <span>contact@pikkles.fr</span>
+                <span>pikkles.delivery@gmail.com</span>
               </div>
               <div className="flex items-center space-x-2 text-gray-300">
                 <Phone className="h-4 w-4" />
-                <span>01 23 45 67 89</span>
+                <span>07 81 90 96 73</span>
               </div>
             </div>
             <div className="text-gray-400 text-sm">
