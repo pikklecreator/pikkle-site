@@ -868,10 +868,25 @@ const DriverRegistration = ({ onDriverRegistered }) => {
               <h4 className="font-medium text-gray-800 mb-2">Après validation de votre dossier :</h4>
               <ol className="text-sm text-gray-600 space-y-1">
                 <li>1. Vérification documents et SIRET (24-48h)</li>
-                <li>2. Activation de votre compte livreur</li>
-                <li>3. Téléchargement de l'app mobile obligatoire</li>
-                <li>4. Formation en ligne et première course</li>
+                <li>2. <strong>Génération contrat KYC personnalisé</strong></li>
+                <li>3. <strong>Envoi par email du contrat à signer</strong></li>
+                <li>4. <strong>Retour contrat signé manuellement</strong></li>
+                <li>5. Activation définitive de votre compte livreur</li>
               </ol>
+            </div>
+            
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-green-800">🔐 Processus KYC Sécurisé</p>
+                  <p className="text-sm text-green-600 mt-1">
+                    Un contrat personnalisé avec toutes vos données (nom, SIRET, véhicule, assurance) sera généré et envoyé par email. 
+                    <br/>
+                    <strong>Signature manuscrite requise</strong> pour finaliser votre inscription.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         );
