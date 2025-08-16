@@ -175,6 +175,48 @@ async def update_driver(driver_id: str, driver_update: DriverUpdate):
         {"$set": update_data}
     )
     
+# Statistics and Dashboard Routes
+@api_router.get("/drivers/{driver_id}/stats")
+async def get_driver_stats(driver_id: str):
+    """Get driver statistics for dashboard"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="Livreur non trouvé")
+    
+    # Mock stats for now - will be replaced with real data
+    stats = {
+        "total_deliveries": 0,
+        "total_earnings": 0.0,
+        "current_balance": 0.0,
+        "document_status": {
+            "identity_verified": bool(driver.get("documents", {}).get("identity_card_front")),
+            "documents_complete": False,
+            "bank_info_complete": bool(driver.get("bank_info")),
+            "contract_signed": bool(driver.get("contract", {}).get("accepts_cgu")),
+            "kyc_contract_status": driver.get("contract", {}).get("kyc_contract_signed", False)
+        },
+        "next_payout_date": "2024-08-15",
+        "account_status": driver.get("status", "pending"),
+        "kyc_status": {
+            "contract_generated": driver.get("contract", {}).get("kyc_contract_generated", False),
+            "contract_sent": bool(driver.get("contract", {}).get("kyc_contract_sent_date")),
+            "contract_signed": driver.get("contract", {}).get("kyc_contract_signed", False)
+        }
+    }
+    
+    # Check document completeness
+    documents = driver.get("documents", {})
+    business_info = driver.get("business_info", {})
+    required_docs = ["identity_card_front", "identity_card_back", "proof_of_residence"]
+    insurance_docs = ["civil_liability_insurance", "vehicle_insurance", "vehicle_contract"]
+    
+    stats["document_status"]["documents_complete"] = all(documents.get(doc) for doc in required_docs)
+    stats["document_status"]["insurance_complete"] = all(documents.get(doc) for doc in insurance_docs)
+    stats["document_status"]["siret_provided"] = bool(business_info.get("siret"))
+    stats["document_status"]["siret_verified"] = business_info.get("siret_verified", False)
+    
+    return stats
+
     updated_driver = await db.drivers.find_one({"id": driver_id})
     return Driver(**updated_driver)
 
