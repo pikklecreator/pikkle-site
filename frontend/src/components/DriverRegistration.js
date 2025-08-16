@@ -407,8 +407,13 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="votre@email.com"
                   required
-                  className="focus:border-green-500 focus:ring-green-500"
+                  className={`focus:border-green-500 focus:ring-green-500 ${
+                    profileData.email && !validateEmail(profileData.email) ? 'border-red-500' : ''
+                  }`}
                 />
+                {profileData.email && !validateEmail(profileData.email) && (
+                  <p className="text-sm text-red-600">Format email invalide</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Téléphone *</Label>
@@ -416,11 +421,21 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                   id="phone"
                   type="tel"
                   value={profileData.phone}
-                  onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                  placeholder="06 12 34 56 78"
+                  onChange={(e) => {
+                    const phone = e.target.value.replace(/[^0-9]/g, '');
+                    if (phone.length <= 10) {
+                      setProfileData(prev => ({ ...prev, phone: phone }));
+                    }
+                  }}
+                  placeholder="0612345678"
                   required
-                  className="focus:border-green-500 focus:ring-green-500"
+                  className={`focus:border-green-500 focus:ring-green-500 ${
+                    profileData.phone && !validatePhone(profileData.phone) ? 'border-red-500' : ''
+                  }`}
                 />
+                {profileData.phone && !validatePhone(profileData.phone) && (
+                  <p className="text-sm text-red-600">Numéro français requis (06, 07, 01, etc.)</p>
+                )}
               </div>
             </div>
 
