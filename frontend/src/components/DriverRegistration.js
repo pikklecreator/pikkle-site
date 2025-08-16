@@ -220,7 +220,10 @@ const DriverRegistration = ({ onDriverRegistered }) => {
             business_info: {
               siret: businessData.siret,
               company_name: businessData.company_name,
-              business_address: businessData.business_address
+              business_address: businessData.business_address,
+              vehicle_type: businessData.vehicle_type,
+              insurance_provider: businessData.insurance_provider,
+              insurance_number: businessData.insurance_number
             },
             registration_step: 4
           });
