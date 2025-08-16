@@ -89,18 +89,24 @@ const DriverRegistration = ({ onDriverRegistered }) => {
     },
     { 
       id: 3, 
+      title: 'Assurances', 
+      icon: <Building className="h-5 w-5" />,
+      description: 'Documents assurance'
+    },
+    { 
+      id: 4, 
       title: 'SIRET', 
       icon: <Building className="h-5 w-5" />,
       description: 'Statut indépendant'
     },
     { 
-      id: 4, 
+      id: 5, 
       title: 'RIB', 
       icon: <CreditCard className="h-5 w-5" />,
       description: 'Coordonnées bancaires'
     },
     { 
-      id: 5, 
+      id: 6, 
       title: 'Validation', 
       icon: <FileCheck className="h-5 w-5" />,
       description: 'Finalisation'
