@@ -114,6 +114,8 @@ async def create_driver(driver_data: DriverUpdate):
         driver_dict["profile"] = driver_data.profile.dict()
     if driver_data.documents:
         driver_dict["documents"] = driver_data.documents.dict()
+    if driver_data.business_info:
+        driver_dict["business_info"] = driver_data.business_info.dict()
     if driver_data.bank_info:
         driver_dict["bank_info"] = driver_data.bank_info.dict()
     if driver_data.contract:
