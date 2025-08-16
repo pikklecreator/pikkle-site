@@ -269,7 +269,9 @@ const DriverRegistration = ({ onDriverRegistered }) => {
       case 3:
         return documentFiles.civil_liability_insurance && documentFiles.vehicle_insurance && documentFiles.vehicle_contract;
       case 4:
-        return businessData.siret && validateSIRET(businessData.siret) && businessData.company_name && businessData.business_address;
+        return businessData.siret && validateSIRET(businessData.siret) && businessData.company_name && 
+               businessData.business_address && businessData.vehicle_type && businessData.insurance_provider && 
+               businessData.insurance_number;
       case 5:
         return bankData.bank_name && bankData.iban && bankData.account_holder_name;
       case 6:
