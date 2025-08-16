@@ -306,40 +306,11 @@ async def get_kyc_status(driver_id: str):
     }
 
 # Statistics and Dashboard Routes
-@api_router.get("/drivers/{driver_id}/stats")
-async def get_driver_stats(driver_id: str):
-    """Get driver statistics for dashboard"""
-    driver = await db.drivers.find_one({"id": driver_id})
-    if not driver:
-        raise HTTPException(status_code=404, detail="Livreur non trouvé")
-    
-    # Mock stats for now - will be replaced with real data
-    stats = {
-        "total_deliveries": 0,
-        "total_earnings": 0.0,
-        "current_balance": 0.0,
-        "document_status": {
-            "identity_verified": bool(driver.get("documents", {}).get("identity_card_front")),
-            "documents_complete": False,
-            "bank_info_complete": bool(driver.get("bank_info")),
-            "contract_signed": bool(driver.get("contract", {}).get("accepts_cgu"))
-        },
-        "next_payout_date": "2024-08-15",
-        "account_status": driver.get("status", "pending")
-    }
-    
-    # Check document completeness
-    documents = driver.get("documents", {})
-    business_info = driver.get("business_info", {})
-    required_docs = ["identity_card_front", "identity_card_back", "proof_of_residence"]
-    insurance_docs = ["civil_liability_insurance", "vehicle_insurance", "vehicle_contract"]
-    
-    stats["document_status"]["documents_complete"] = all(documents.get(doc) for doc in required_docs)
-    stats["document_status"]["insurance_complete"] = all(documents.get(doc) for doc in insurance_docs)
-    stats["document_status"]["siret_provided"] = bool(business_info.get("siret"))
-    stats["document_status"]["siret_verified"] = business_info.get("siret_verified", False)
-    
-    return stats
+@api_router.get("/drivers/{driver_id}/payments", response_model=List[PaymentHistory])
+async def get_driver_payments(driver_id: str):
+    """Get payment history for a driver"""
+    payments = await db.payments.find({"driver_id": driver_id}).to_list(100)
+    return [PaymentHistory(**payment) for payment in payments]
 
 # General Routes
 @api_router.get("/")
