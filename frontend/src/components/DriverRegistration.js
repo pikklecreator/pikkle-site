@@ -288,8 +288,52 @@ const DriverRegistration = ({ onDriverRegistered }) => {
     return mobileRegex.test(phoneClean) || landlineRegex.test(phoneClean);
   };
 
-  const validatePostalCode = (code) => {
-    return /^[0-9]{5}$/.test(code);
+  // Base de données des codes postaux français (principales villes)
+  const postalCodeCities = {
+    // Paris et région parisienne
+    '75001': 'Paris', '75002': 'Paris', '75003': 'Paris', '75004': 'Paris', '75005': 'Paris',
+    '75006': 'Paris', '75007': 'Paris', '75008': 'Paris', '75009': 'Paris', '75010': 'Paris',
+    '75011': 'Paris', '75012': 'Paris', '75013': 'Paris', '75014': 'Paris', '75015': 'Paris',
+    '75016': 'Paris', '75017': 'Paris', '75018': 'Paris', '75019': 'Paris', '75020': 'Paris',
+    
+    // Marseille
+    '13001': 'Marseille', '13002': 'Marseille', '13003': 'Marseille', '13004': 'Marseille',
+    '13005': 'Marseille', '13006': 'Marseille', '13007': 'Marseille', '13008': 'Marseille',
+    '13009': 'Marseille', '13010': 'Marseille', '13011': 'Marseille', '13012': 'Marseille',
+    '13013': 'Marseille', '13014': 'Marseille', '13015': 'Marseille', '13016': 'Marseille',
+    
+    // Lyon
+    '69001': 'Lyon', '69002': 'Lyon', '69003': 'Lyon', '69004': 'Lyon', '69005': 'Lyon',
+    '69006': 'Lyon', '69007': 'Lyon', '69008': 'Lyon', '69009': 'Lyon',
+    
+    // Autres grandes villes
+    '06000': 'Nice', '31000': 'Toulouse', '44000': 'Nantes', '67000': 'Strasbourg',
+    '34000': 'Montpellier', '33000': 'Bordeaux', '59000': 'Lille', '35000': 'Rennes',
+    '51100': 'Reims', '80000': 'Amiens', '76000': 'Rouen', '25000': 'Besançon',
+    '87000': 'Limoges', '63000': 'Clermont-Ferrand', '38000': 'Grenoble', '49000': 'Angers',
+    '37000': 'Tours', '45000': 'Orléans', '21000': 'Dijon', '68000': 'Mulhouse',
+    '54000': 'Nancy', '57000': 'Metz', '97400': 'Saint-Denis', '97200': 'Fort-de-France'
+  };
+
+  // Validation croisée code postal / ville
+  const validatePostalCodeCity = (postalCode, city) => {
+    if (!postalCode || !city) return true; // Pas encore rempli
+    
+    const expectedCity = postalCodeCities[postalCode];
+    if (!expectedCity) return true; // Code postal non référencé, on accepte
+    
+    return expectedCity.toLowerCase() === city.toLowerCase();
+  };
+
+  // Auto-complétion ville basée sur code postal
+  const handlePostalCodeChange = (code) => {
+    const cleanCode = code.replace(/\D/g, '').slice(0, 5);
+    setProfileData(prev => ({ 
+      ...prev, 
+      postal_code: cleanCode,
+      // Auto-complétion de la ville si code postal reconnu
+      city: postalCodeCities[cleanCode] || prev.city
+    }));
   };
 
   // Validation SIRET avancée
