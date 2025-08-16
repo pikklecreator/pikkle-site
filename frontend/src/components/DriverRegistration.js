@@ -748,20 +748,35 @@ const DriverRegistration = ({ onDriverRegistered }) => {
                 <Input
                   id="siret"
                   value={businessData.siret}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{3})(\d{5})/, '$1 $2 $3 $4');
-                    setBusinessData(prev => ({ ...prev, siret: value }));
-                  }}
+                  onChange={(e) => handleSiretChange(e.target.value)}
                   placeholder="123 456 789 01234"
                   required
                   className={`focus:border-green-500 focus:ring-green-500 ${
-                    businessData.siret && !validateSIRET(businessData.siret) ? 'border-red-500' : ''
+                    businessData.siret && siretValidationResult === false ? 'border-red-500' : 
+                    siretValidationResult === true ? 'border-green-500' : ''
                   }`}
                   maxLength={17}
                 />
-                {businessData.siret && !validateSIRET(businessData.siret) && (
-                  <p className="text-sm text-red-600">SIRET invalide (14 chiffres requis)</p>
-                )}
+                <div className="flex items-center space-x-2 min-h-[20px]">
+                  {siretValidationLoading && (
+                    <div className="flex items-center space-x-2">
+                      <div className="loading-spinner h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                      <span className="text-sm text-blue-600">Vérification SIRET...</span>
+                    </div>
+                  )}
+                  {siretValidationResult === false && (
+                    <div className="flex items-center space-x-2">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <span className="text-sm text-red-600">SIRET invalide ou inactif</span>
+                    </div>
+                  )}
+                  {siretValidationResult === true && (
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span className="text-sm text-green-600">SIRET valide et actif ✓</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
