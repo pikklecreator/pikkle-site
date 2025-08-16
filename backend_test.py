@@ -360,7 +360,7 @@ def main():
         print("❌ Driver creation failed, skipping dependent tests")
     
     # Run error handling tests
-    print("\n📋 PHASE 4: Error Handling Tests")
+    print("\n📋 PHASE 5: Error Handling Tests")
     tester.test_get_nonexistent_driver()
     tester.test_invalid_driver_creation()
     
