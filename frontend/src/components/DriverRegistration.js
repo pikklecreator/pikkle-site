@@ -47,7 +47,10 @@ const DriverRegistration = ({ onDriverRegistered }) => {
     identity_card_front: null,
     identity_card_back: null,
     proof_of_residence: null,
-    residence_permit: null
+    residence_permit: null,
+    civil_liability_insurance: null,
+    vehicle_insurance: null,
+    vehicle_contract: null
   });
 
   const [businessData, setBusinessData] = useState({
