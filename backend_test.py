@@ -311,19 +311,37 @@ class PikklesAPITester:
         
         return success and success2
 
-    def test_kbis_document_upload(self):
-        """Test K-bis document upload"""
+    def test_insurance_document_upload(self):
+        """Test insurance document upload endpoints"""
         if not self.driver_id:
             print("❌ No driver ID available for testing")
             return False
             
-        # Test document upload endpoint for K-bis
-        return self.run_test(
-            "K-bis Document Upload Endpoint",
+        # Test civil liability insurance upload endpoint
+        success1 = self.run_test(
+            "Civil Liability Insurance Upload Endpoint",
             "POST",
-            f"drivers/{self.driver_id}/upload-document?document_type=kbis_document",
+            f"drivers/{self.driver_id}/upload-document?document_type=civil_liability_insurance",
             422,  # Should fail without actual file
         )[0]
+        
+        # Test vehicle insurance upload endpoint
+        success2 = self.run_test(
+            "Vehicle Insurance Upload Endpoint",
+            "POST",
+            f"drivers/{self.driver_id}/upload-document?document_type=vehicle_insurance",
+            422,  # Should fail without actual file
+        )[0]
+        
+        # Test vehicle contract upload endpoint
+        success3 = self.run_test(
+            "Vehicle Contract Upload Endpoint",
+            "POST",
+            f"drivers/{self.driver_id}/upload-document?document_type=vehicle_contract",
+            422,  # Should fail without actual file
+        )[0]
+        
+        return success1 and success2 and success3
 
     def test_invalid_driver_creation(self):
         """Test creating driver with invalid data"""
