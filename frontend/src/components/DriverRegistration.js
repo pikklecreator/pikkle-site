@@ -341,7 +341,8 @@ const DriverRegistration = ({ onDriverRegistered }) => {
       case 3:
         return documentFiles.civil_liability_insurance && documentFiles.vehicle_insurance && documentFiles.vehicle_contract;
       case 4:
-        return businessData.siret && validateSIRET(businessData.siret) && 
+        const siretValid = businessData.siret && await checkSIRETWithAPI(businessData.siret);
+        return siretValid && 
                businessData.company_name && businessData.company_name.length >= 3 &&
                businessData.business_address && businessData.business_address.length >= 10 &&
                businessData.vehicle_type && businessData.vehicle_type.length >= 3 &&
