@@ -136,8 +136,31 @@ class PikklesAPITester:
             data=documents_data
         )[0]
 
-    def test_update_driver_step3(self):
-        """Test updating driver with step 3 data (SIRET business info)"""
+    def test_update_driver_step3_insurance(self):
+        """Test updating driver with step 3 data (insurance documents)"""
+        if not self.driver_id:
+            print("❌ No driver ID available for testing")
+            return False
+            
+        insurance_data = {
+            "documents": {
+                "civil_liability_insurance": "uploads/test/civil_liability.pdf",
+                "vehicle_insurance": "uploads/test/vehicle_insurance.pdf",
+                "vehicle_contract": "uploads/test/vehicle_contract.pdf"
+            },
+            "registration_step": 3
+        }
+        
+        return self.run_test(
+            "Update Driver - Step 3 (Insurance Documents)",
+            "PUT",
+            f"drivers/{self.driver_id}",
+            200,
+            data=insurance_data
+        )[0]
+
+    def test_update_driver_step4_siret(self):
+        """Test updating driver with step 4 data (SIRET business info)"""
         if not self.driver_id:
             print("❌ No driver ID available for testing")
             return False
@@ -149,19 +172,19 @@ class PikklesAPITester:
                 "business_address": "123 Rue de la Paix, 75001 Paris",
                 "siret_verified": False
             },
-            "registration_step": 3
+            "registration_step": 4
         }
         
         return self.run_test(
-            "Update Driver - Step 3 (SIRET Business Info)",
+            "Update Driver - Step 4 (SIRET Business Info)",
             "PUT",
             f"drivers/{self.driver_id}",
             200,
             data=business_data
         )[0]
 
-    def test_update_driver_step4(self):
-        """Test updating driver with step 4 data (bank info)"""
+    def test_update_driver_step5_bank(self):
+        """Test updating driver with step 5 data (bank info)"""
         if not self.driver_id:
             print("❌ No driver ID available for testing")
             return False
@@ -173,19 +196,19 @@ class PikklesAPITester:
                 "bic": "AGRIFRPP",
                 "account_holder_name": "Jean Dupont"
             },
-            "registration_step": 4
+            "registration_step": 5
         }
         
         return self.run_test(
-            "Update Driver - Step 4 (Bank Info)",
+            "Update Driver - Step 5 (Bank Info)",
             "PUT",
             f"drivers/{self.driver_id}",
             200,
             data=bank_data
         )[0]
 
-    def test_update_driver_step5(self):
-        """Test updating driver with step 5 data (contract with app download)"""
+    def test_update_driver_step6_final(self):
+        """Test updating driver with step 6 data (contract with app download)"""
         if not self.driver_id:
             print("❌ No driver ID available for testing")
             return False
@@ -198,12 +221,12 @@ class PikklesAPITester:
                 "accepts_app_download": True,
                 "signature_date": datetime.utcnow().isoformat()
             },
-            "registration_step": 5,
+            "registration_step": 6,
             "status": "under_review"
         }
         
         return self.run_test(
-            "Update Driver - Step 5 (Contract with App Download)",
+            "Update Driver - Step 6 (Final Contract with App Download)",
             "PUT",
             f"drivers/{self.driver_id}",
             200,
