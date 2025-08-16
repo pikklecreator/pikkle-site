@@ -67,7 +67,7 @@ class PikklesAPITester:
         )
 
     def test_create_driver_step1(self):
-        """Test creating a driver with step 1 data (profile)"""
+        """Test creating a driver with step 1 data (profile with detailed address)"""
         profile_data = {
             "profile": {
                 "firstname": "Jean",
@@ -75,7 +75,12 @@ class PikklesAPITester:
                 "email": "jean.dupont@test.com",
                 "phone": "+33123456789",
                 "date_of_birth": "1990-01-15",
-                "address": "123 Rue de la Paix, 75001 Paris"
+                "address": "123 Rue de la Paix, 75001 Paris",
+                "street_number": "123",
+                "street_name": "Rue de la Paix",
+                "city": "Paris",
+                "postal_code": "75001",
+                "country": "France"
             },
             "registration_step": 1
         }
