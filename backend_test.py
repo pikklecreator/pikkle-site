@@ -353,19 +353,22 @@ class PikklesAPITester:
                     "firstname": "Jean",
                     "lastname": "Dupont", 
                     "email": email,
-                    "phone": "0612345678"
+                    "phone": "0612345678",
+                    "address": "123 Rue de la Paix, 75001 Paris"
                 }
             }
             
-            success, _ = self.run_test(
+            success, response = self.run_test(
                 f"Email Validation - Invalid: {email}",
                 "POST",
                 "drivers",
-                400,
+                422,  # Pydantic validation returns 422
                 data=invalid_data
             )
             
-            if not success:
+            if success and "email" in str(response):
+                print(f"✅ Email validation working for: {email}")
+            else:
                 print(f"❌ Email validation failed for: {email}")
                 return False
         
@@ -381,19 +384,22 @@ class PikklesAPITester:
                     "firstname": "Jean",
                     "lastname": "Dupont",
                     "email": "jean@test.com",
-                    "phone": phone
+                    "phone": phone,
+                    "address": "123 Rue de la Paix, 75001 Paris"
                 }
             }
             
-            success, _ = self.run_test(
+            success, response = self.run_test(
                 f"Phone Validation - Invalid: {phone}",
                 "POST", 
                 "drivers",
-                400,
+                400,  # Backend validation returns 400
                 data=invalid_data
             )
             
-            if not success:
+            if success and "téléphone" in str(response):
+                print(f"✅ Phone validation working for: {phone}")
+            else:
                 print(f"❌ Phone validation failed for: {phone}")
                 return False
         
@@ -414,19 +420,22 @@ class PikklesAPITester:
                     "firstname": names["firstname"],
                     "lastname": names["lastname"],
                     "email": "jean@test.com",
-                    "phone": "0612345678"
+                    "phone": "0612345678",
+                    "address": "123 Rue de la Paix, 75001 Paris"
                 }
             }
             
-            success, _ = self.run_test(
+            success, response = self.run_test(
                 f"Name Validation - Invalid: {names['firstname']}/{names['lastname']}",
                 "POST",
                 "drivers", 
-                400,
+                400,  # Backend validation returns 400
                 data=invalid_data
             )
             
-            if not success:
+            if success and ("prénom" in str(response) or "nom" in str(response)):
+                print(f"✅ Name validation working for: {names}")
+            else:
                 print(f"❌ Name validation failed for: {names}")
                 return False
         
@@ -449,7 +458,7 @@ class PikklesAPITester:
                 }
             }
             
-            success, _ = self.run_test(
+            success, response = self.run_test(
                 f"SIRET Validation - Invalid: {siret}",
                 "PUT",
                 f"drivers/{self.driver_id}",
@@ -457,7 +466,9 @@ class PikklesAPITester:
                 data=invalid_data
             )
             
-            if not success:
+            if success and "SIRET" in str(response):
+                print(f"✅ SIRET validation working for: {siret}")
+            else:
                 print(f"❌ SIRET validation failed for: {siret}")
                 return False
         
@@ -470,7 +481,8 @@ class PikklesAPITester:
                 "firstname": "Jean",
                 "lastname": "Dupont",
                 "email": "jean.dupont@gmail.com", 
-                "phone": "0612345678"
+                "phone": "0612345678",
+                "address": "123 Rue de la Paix, 75001 Paris"
             }
         }
         
@@ -512,19 +524,25 @@ class PikklesAPITester:
                 "firstname": "aaa",
                 "lastname": "bbb", 
                 "email": "ccc",
-                "phone": "ddd"
+                "phone": "ddd",
+                "address": "fake address"
             }
         }
         
-        success, _ = self.run_test(
+        success, response = self.run_test(
             "Bypass Prevention - Random Data",
             "POST",
             "drivers",
-            400,
+            422,  # Should fail with validation error
             data=bypass_data
         )
         
-        return success
+        if success and "email" in str(response):
+            print("✅ Bypass prevention working - random data rejected")
+            return True
+        else:
+            print("❌ Bypass prevention failed - random data accepted")
+            return False
 
 def main():
     print("🚀 Starting Pikkles API Backend Tests")
