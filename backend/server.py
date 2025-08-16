@@ -148,6 +148,8 @@ async def update_driver(driver_id: str, driver_update: DriverUpdate):
         update_data["profile"] = driver_update.profile.dict()
     if driver_update.documents:
         update_data["documents"] = driver_update.documents.dict()
+    if driver_update.business_info:
+        update_data["business_info"] = driver_update.business_info.dict()
     if driver_update.bank_info:
         update_data["bank_info"] = driver_update.bank_info.dict()
     if driver_update.contract:
