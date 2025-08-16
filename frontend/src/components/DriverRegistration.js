@@ -57,6 +57,9 @@ const DriverRegistration = ({ onDriverRegistered }) => {
     siret: '',
     company_name: '',
     business_address: '',
+    vehicle_type: '',
+    insurance_provider: '',
+    insurance_number: '',
     kbis_document: null
   });
 
