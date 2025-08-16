@@ -11,7 +11,6 @@ import {
   CheckCircle,
   Phone,
   Mail,
-  MapPin,
   Download,
   Truck
 } from 'lucide-react';
