@@ -73,14 +73,9 @@ class PikklesAPITester:
                 "firstname": "Jean",
                 "lastname": "Dupont",
                 "email": "jean.dupont@test.com",
-                "phone": "+33123456789",
+                "phone": "0612345678",
                 "date_of_birth": "1990-01-15",
-                "address": "123 Rue de la Paix, 75001 Paris",
-                "street_number": "123",
-                "street_name": "Rue de la Paix",
-                "city": "Paris",
-                "postal_code": "75001",
-                "country": "France"
+                "address": "123 Rue de la Paix, 75001 Paris"
             },
             "registration_step": 1
         }
