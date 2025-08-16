@@ -275,14 +275,34 @@ const DriverDashboard = ({ driver }) => {
                       <Download className="h-4 w-4 mr-2" />
                       Télécharger RIB
                     </Button>
-                    <Button variant="outline" size="sm" className="justify-start">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="justify-start bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
+                      onClick={() => window.open('tel:0781909673')}
+                    >
                       <Phone className="h-4 w-4 mr-2" />
-                      Contacter support
+                      Support Livreur
                     </Button>
-                    <Button variant="outline" size="sm" className="justify-start">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="justify-start bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
+                      onClick={() => window.open('mailto:pikkles.delivery@gmail.com')}
+                    >
                       <Mail className="h-4 w-4 mr-2" />
-                      Mes messages
+                      Email Support
                     </Button>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-xs text-green-700 text-center">
+                      <strong>🎯 Support Livreur Dédié</strong>
+                      <br/>
+                      📞 07 81 90 96 73 • 7j/7 de 8h à 22h
+                      <br/>
+                      ✉️ pikkles.delivery@gmail.com
+                    </p>
                   </div>
                 </CardContent>
               </Card>
