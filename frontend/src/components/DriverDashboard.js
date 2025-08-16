@@ -432,24 +432,19 @@ const DriverDashboard = ({ driver }) => {
                   </div>
 
                   <div className="space-y-4">
-                    <h4 className="font-medium text-gray-900">Informations bancaires</h4>
+                    <h4 className="font-medium text-gray-900">Informations professionnelles</h4>
                     <div className="space-y-3">
                       <div>
-                        <label className="text-sm font-medium text-gray-600">Banque</label>
-                        <p className="mt-1">{driver.bank_info?.bank_name || 'Non renseignée'}</p>
+                        <label className="text-sm font-medium text-gray-600">Entreprise</label>
+                        <p className="mt-1">{driver.business_info?.company_name || 'Non renseignée'}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-600">Titulaire</label>
-                        <p className="mt-1">{driver.bank_info?.account_holder_name || 'Non renseigné'}</p>
+                        <label className="text-sm font-medium text-gray-600">SIRET</label>
+                        <p className="mt-1 font-mono text-sm">{driver.business_info?.siret || 'Non renseigné'}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-600">IBAN</label>
-                        <p className="mt-1 font-mono text-sm">
-                          {driver.bank_info?.iban ? 
-                            `${driver.bank_info.iban.substring(0, 8)}****${driver.bank_info.iban.substring(driver.bank_info.iban.length - 4)}` 
-                            : 'Non renseigné'
-                          }
-                        </p>
+                        <label className="text-sm font-medium text-gray-600">Adresse de domiciliation</label>
+                        <p className="mt-1 text-sm">{driver.business_info?.business_address || 'Non renseignée'}</p>
                       </div>
                     </div>
                   </div>
