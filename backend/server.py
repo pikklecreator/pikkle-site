@@ -191,10 +191,24 @@ async def create_driver(driver_data: DriverUpdate):
                     detail=f"Incohérence: le code postal {postal_found} correspond à {expected_city}, pas à {city_found}"
                 )
     
+
     # Vérification IBAN si fourni
     if driver_data.bank_info and driver_data.bank_info.iban:
         if not validate_iban(driver_data.bank_info.iban):
             raise HTTPException(status_code=400, detail="IBAN invalide")
+
+    # Vérification unicité email et téléphone
+    if driver_data.profile:
+        email = driver_data.profile.email
+        phone = driver_data.profile.phone
+        # Vérifier email unique
+        existing_email = await db.drivers.find_one({"profile.email": email})
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email déjà utilisé")
+        # Vérifier téléphone unique
+        existing_phone = await db.drivers.find_one({"profile.phone": phone})
+        if existing_phone:
+            raise HTTPException(status_code=400, detail="Téléphone déjà utilisé")
 
     driver_dict = {
         "id": str(uuid.uuid4()),
