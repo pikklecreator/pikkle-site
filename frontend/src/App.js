@@ -9,6 +9,7 @@ import DriverRegistration from "./components/DriverRegistration";
 import DriverDashboard from "./components/DriverDashboard";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import Courses from "./components/Courses";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -68,6 +69,7 @@ function App() {
                   <Navigate to="/inscription-livreur" replace />
                 } 
               />
+              <Route path="/courses" element={<Courses />} />
               <Route path="/cgu" element={<div className="container mx-auto py-16 px-4"><h1 className="text-3xl font-bold mb-8">Conditions Générales d'Utilisation</h1><p>Contenu des CGU à venir...</p></div>} />
               <Route path="/confidentialite" element={<div className="container mx-auto py-16 px-4"><h1 className="text-3xl font-bold mb-8">Politique de Confidentialité</h1><p>Contenu RGPD à venir...</p></div>} />
               <Route path="/contrat-type" element={<div className="container mx-auto py-16 px-4"><h1 className="text-3xl font-bold mb-8">Contrat Indépendant Type</h1><p>Modèle de contrat à venir...</p></div>} />

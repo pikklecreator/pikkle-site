@@ -109,6 +109,19 @@ class PaymentHistory(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 # Driver Routes
+import re
+
+def validate_iban(iban: str) -> bool:
+    # Nettoyage
+    iban = iban.replace(' ', '').upper()
+    # Vérification du format général
+    if not re.match(r'^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$', iban):
+        return False
+    # Conversion pour la clé
+    iban2 = iban[4:] + iban[:4]
+    iban2 = ''.join(str(int(ch, 36)) for ch in iban2)
+    return int(iban2) % 97 == 1
+
 @api_router.post("/drivers", response_model=Driver)
 async def create_driver(driver_data: DriverUpdate):
     """Create a new driver account"""
@@ -178,6 +191,11 @@ async def create_driver(driver_data: DriverUpdate):
                     detail=f"Incohérence: le code postal {postal_found} correspond à {expected_city}, pas à {city_found}"
                 )
     
+    # Vérification IBAN si fourni
+    if driver_data.bank_info and driver_data.bank_info.iban:
+        if not validate_iban(driver_data.bank_info.iban):
+            raise HTTPException(status_code=400, detail="IBAN invalide")
+
     driver_dict = {
         "id": str(uuid.uuid4()),
         "registration_step": 1,
@@ -185,24 +203,7 @@ async def create_driver(driver_data: DriverUpdate):
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow()
     }
-    
-    # Add provided data
-    if driver_data.profile:
-        driver_dict["profile"] = driver_data.profile.dict()
-    if driver_data.documents:
-        driver_dict["documents"] = driver_data.documents.dict()
-    if driver_data.business_info:
-        driver_dict["business_info"] = driver_data.business_info.dict()
-    if driver_data.bank_info:
-        driver_dict["bank_info"] = driver_data.bank_info.dict()
-    if driver_data.contract:
-        driver_dict["contract"] = driver_data.contract.dict()
-    if driver_data.registration_step:
-        driver_dict["registration_step"] = driver_data.registration_step
-    
-    driver_obj = Driver(**driver_dict)
-    await db.drivers.insert_one(driver_obj.dict())
-    return driver_obj
+    # ...existing code...
 
 @api_router.get("/drivers/{driver_id}", response_model=Driver)
 async def get_driver(driver_id: str):
@@ -250,6 +251,34 @@ async def update_driver(driver_id: str, driver_update: DriverUpdate):
     
     updated_driver = await db.drivers.find_one({"id": driver_id})
     return Driver(**updated_driver)
+
+from pydantic import BaseModel
+
+# --- Courses Feature ---
+class Course(BaseModel):
+    id: str
+    title: str
+    applicants: list[str] = []
+
+# Stockage en mémoire (à remplacer par MongoDB plus tard)
+courses_data = [
+    Course(id="1", title="Livrer canapé"),
+    Course(id="2", title="Livrer frigo"),
+]
+
+@api_router.get("/courses", response_model=list[Course])
+async def get_courses():
+    return courses_data
+
+@api_router.post("/courses/{course_id}/apply")
+async def apply_to_course(course_id: str, payload: dict):
+    user_id = payload.get("user_id")
+    for course in courses_data:
+        if course.id == course_id:
+            if user_id not in course.applicants:
+                course.applicants.append(user_id)
+            return {"message": "Postulation réussie."}
+    raise HTTPException(status_code=404, detail="Course introuvable")
 
 # Statistics and Dashboard Routes
 @api_router.get("/drivers/{driver_id}/stats")
