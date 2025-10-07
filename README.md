@@ -39,6 +39,12 @@ Ce site est **connecté à deux applications mobiles** qui viendront compléter 
 
 ---
 
+# Badges
+
+![CI](https://github.com/pikklecreator/pikkle-site/actions/workflows/ci.yml/badge.svg)
+
+---
+
 ## 🚀 Installation (en local)
 
 ```bash
@@ -48,11 +54,31 @@ cd pikkle-site
 
 # Installer les dépendances frontend
 cd frontend
-yarn install
-yarn start
+npm install
+npm start
 
-# (optionnel) Lancer le backend si présent
+# Lancer le backend
 cd ../backend
-python app.py  # ou un autre point d'entrée
-[ Commit new file ]
+python server.py
+```
+
+## 🧪 Lancer les tests
+
+```bash
+# Backend
+cd backend
+pytest ../advanced_validation_test.py ../backend_test.py
+
+# Frontend
+cd frontend
+npm test
+```
+
+## 🤝 Contribuer
+
+Voir [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## 📄 Code de conduite
+
+Voir [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
